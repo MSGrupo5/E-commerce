@@ -2,17 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Catálogo Simple')</title>
+    <title>@yield('title', 'Catálogo Gaming')</title>
     @vite('resources/css/app.css')
 </head>
 <body class="bg-gray-100 text-gray-900">
+
     <!-- Header -->
-    <header class="bg-blue-600 text-white p-4">
-        <h1 class="text-2xl font-bold">Catálogo Simple</h1>
-        <nav>
-            <a href="/" class="mr-4">Inicio</a>
-            <a href="/carrito" class="mr-4">Carrito</a>
-            <a href="/login">Login</a>
+    <header class="bg-violet-600 text-white p-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">NexusTech</h1>
+        <nav class="space-x-4">
+            <a href="/" class="hover:underline">Inicio</a>
+            <a href="/catalogo" class="hover:underline">Productos</a>
+            <a href="/carrito" class="hover:underline">Carrito</a>
+            <a href="/login" class="hover:underline">Login</a>
         </nav>
     </header>
 
