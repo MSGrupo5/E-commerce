@@ -39,17 +39,23 @@ Route::get('/carrito', function () {
     return view('carrito', compact('carrito'));
 });
 
+
 // Login
 Route::get('/login', function () {
     return view('auth.login');
 });
 
-// Registro (simulación)
+Route::post('/login', function () {
+    // Simulación de login
+    return redirect('/')->with('success', 'Inicio de sesión correcto (simulado)');
+});
+
+// Registro
 Route::get('/register', function () {
     return view('auth.register');
 });
-// Simulación de registro (no funcional)
+
 Route::post('/register', function () {
-    // Por ahora solo simula el registro
+    // Simulación de registro
     return redirect('/')->with('success', 'Usuario registrado correctamente (simulado)');
 });
