@@ -44,7 +44,12 @@ Route::get('/login', function () {
     return view('auth.login');
 });
 
-// Registro
+// Registro (simulación)
 Route::get('/register', function () {
     return view('auth.register');
+});
+// Simulación de registro (no funcional)
+Route::post('/register', function () {
+    // Por ahora solo simula el registro
+    return redirect('/')->with('success', 'Usuario registrado correctamente (simulado)');
 });
