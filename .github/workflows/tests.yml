@@ -33,10 +33,10 @@ jobs:
       - name: Instalar dependencias PHP
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Instalar dependencias Node        # ← NUEVO
+      - name: Instalar dependencias Node
         run: npm install
 
-      - name: Compilar assets Vite              # ← NUEVO (genera el manifest.json)
+      - name: Compilar assets Vite
         run: npm run build
 
       - name: Copiar archivo de entorno
