@@ -42,9 +42,6 @@ jobs:
       - name: Copiar archivo de entorno
         run: cp .env.example .env
 
-      - name: Configurar entorno de test
-        run: cp .env.testing .env
-
       - name: Generar clave de aplicación
         run: php artisan key:generate --force
 
