@@ -1,59 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🛒 eCommerce Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> Proyecto académico — Gestión de Sistemas · Metodología Scrum
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=flat&logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat&logo=mysql&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
+![Estado](https://img.shields.io/badge/Sprint_0-En_curso-yellow?style=flat)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Equipo
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Nombre | Rol |
+|---|---|
+| Valeria Budiño | Scrum Master |
+| Samuel Casanueva | Product Owner + QA / Deploy |
+| Ramiro Corrales | Developer — Backend |
+| Mauricio Cardozo | Developer — Backend / DB |
+| Nicolás Mendoza | Developer — Frontend / UI |
+| Tomás Centurión | Developer — Frontend / UI |
+| Marcos Urbina | Developer — Full Stack / Integración |
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Requisitos Previos
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **PHP** >= 8.2
+- **Composer** >= 2.x → https://getcomposer.org
+- **Node.js** >= 18.x + npm → https://nodejs.org
+- **MySQL** >= 8.0
+- **Git**
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Instalación
 
-### Premium Partners
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/[usuario]/ecommerce-laravel.git
+cd ecommerce-laravel
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# 2. Instalar dependencias PHP
+composer install
 
-## Contributing
+# 3. Instalar dependencias Node
+npm install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 4. Copiar el archivo de entorno
+cp .env.example .env
 
-## Code of Conduct
+# 5. Generar clave de la aplicación
+php artisan key:generate
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 6. Configurar .env con tus credenciales de MySQL (ver sección siguiente)
 
-## Security Vulnerabilities
+# 7. Crear la base de datos en MySQL
+# CREATE DATABASE ecommerce_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 8. Ejecutar las migraciones
+php artisan migrate
 
-## License
+# 9. Crear el enlace simbólico para imágenes
+php artisan storage:link
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 10. Compilar assets y levantar el servidor
+npm run dev
+php artisan serve
+```
+
+La aplicación estará disponible en: **http://localhost:8000**
+
+---
+
+## Configuración del Entorno (.env)
+
+```env
+APP_NAME="eCommerce Laravel"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ecommerce_db
+DB_USERNAME=root
+DB_PASSWORD=
+
+MAIL_MAILER=log
+FILESYSTEM_DISK=public
+```
+
+> `MAIL_MAILER=log` — los emails no se envían; el link de recuperación de contraseña queda registrado en `storage/logs/laravel.log`.
+
+---
+
+## Flujo de Trabajo Git
+
+```
+main        ← solo código listo para producción (nunca pushear directo)
+develop     ← integración del equipo (base para todas las features)
+feature/    ← una rama por historia de usuario
+```
+
+```bash
+# Crear rama para una historia
+git checkout develop
+git pull origin develop
+git checkout -b feature/US-01-registro-cliente  # tipo/JIRA-ID-descripcion-corta
+
+# Subir cambios
+git push origin feature/US-01-registro-cliente
+
+# Abrir Pull Request → develop (requiere 1 aprobación antes de mergear)
+```
+
+---
+
+## Convención de Commits
+
+```
+feat:     nueva funcionalidad
+fix:      corrección de bug
+style:    cambios de estilos / Tailwind
+refactor: refactoring sin cambio funcional
+db:       migraciones o seeders
+chore:    mantenimiento / dependencias
+docs:     documentación
+```
+
+```bash
+# Ejemplos
+git commit -m "US-01/feat: agregar formulario de registro de cliente"
+git commit -m "US-01/db: agregar migración para tabla favorites"
+git commit -m "US-01/style: aplicar paleta de colores al layout principal"
+git commit -m "US-01/docs: documentar variables de entorno en .env.example"
+```
+
+---
