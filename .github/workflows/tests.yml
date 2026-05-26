@@ -2,46 +2,56 @@ name: Tests
 
 on:
   push:
-    branches:
-      - master
-      - '*.x'
+    branches: [develop, main]
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
-
-permissions:
-  contents: read
+    branches: [develop, main]
 
 jobs:
   tests:
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [8.2, 8.3, 8.4]
-
-    name: PHP ${{ matrix.php }}
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: ecommerce_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-      - name: Setup PHP
+      - name: Configurar PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
-          coverage: none
+          php-version: '8.2'
+          extensions: mbstring, pdo_mysql, xml, ctype, json
 
-      - name: Install Composer dependencies
+      - name: Instalar dependencias PHP
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Copy environment file
+      - name: Instalar dependencias Node        # ← NUEVO
+        run: npm install
+
+      - name: Compilar assets Vite              # ← NUEVO (genera el manifest.json)
+        run: npm run build
+
+      - name: Copiar archivo de entorno
         run: cp .env.example .env
 
-      - name: Generate app key
+      - name: Configurar entorno de test
+        run: |
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=ecommerce_test/' .env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=password/' .env
+
+      - name: Generar clave de aplicación
         run: php artisan key:generate
 
-      - name: Execute tests
+      - name: Ejecutar migraciones
+        run: php artisan migrate --force
+
+      - name: Ejecutar tests
         run: php artisan test
