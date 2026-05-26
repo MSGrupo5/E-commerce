@@ -43,9 +43,7 @@ jobs:
         run: cp .env.example .env
 
       - name: Configurar entorno de test
-        run: |
-          sed -i 's/DB_DATABASE=.*/DB_DATABASE=ecommerce_test/' .env
-          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=password/' .env
+        run: cp .env.testing .env
 
       - name: Generar clave de aplicación
         run: php artisan key:generate
