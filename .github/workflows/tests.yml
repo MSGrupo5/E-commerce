@@ -45,6 +45,12 @@ jobs:
       - name: Generar clave de aplicación
         run: php artisan key:generate --force
 
+      - name: Configurar variables de base de datos para testing
+        run: |
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=ecommerce_test/' .env
+          sed -i 's/DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=password/' .env
+
       - name: Ejecutar migraciones
         run: php artisan migrate --force
 
