@@ -22,7 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role',// Agregado para MSGRUP-39
     ];
 
     /**
