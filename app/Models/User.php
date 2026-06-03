@@ -20,9 +20,10 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'apellido', // Agregado para MSGRUP-27
         'email',
         'password',
-        'role',
+        'role', // Agregado para MSGRUP-39
     ];
 
     /**
