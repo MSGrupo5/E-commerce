@@ -17,7 +17,8 @@ class User extends Authenticatable
         'apellido', // Agregado para MSGRUP-27
         'email',
         'password',
-        'role',// Agregado para MSGRUP-39
+        'role',
+        'direccion_entrega',
     ];
 
     protected $hidden = [
