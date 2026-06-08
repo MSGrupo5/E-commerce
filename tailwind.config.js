@@ -28,6 +28,17 @@ export default {
                 error: "#ef4444",
                 warning: "#f59e0b",
             },
+            fontSize: {
+                h1: "40px",
+                h2: "32px",
+                h3: "24px",
+                h4: "20px",
+                h5: "16px",
+                h6: "14px",
+                body: "16px",
+                small: "13px",
+                label: "12px",
+            },
         },
     },
 
