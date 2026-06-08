@@ -1,14 +1,17 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="h-full bg-dark-bg">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechStore - Panel de Administración</title>
-    
+    <title>nexuspc - panel de administración</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=oxanium:wght@400;600;700&family=plus+jakarta+sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=oxanium:wght@400;600;700&family=plus+jakarta+sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -209,5 +212,7 @@
         </main>
     </div>
 
-</body>
+    </body>
+</form>
+
 </html>
