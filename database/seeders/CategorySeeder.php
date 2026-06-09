@@ -2,21 +2,42 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Category;
+use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Category::create(['name' => 'Tarjetas de video']);
-        Category::create(['name' => 'Motherboards']);
-        Category::create(['name' => 'Monitores']);
-        Category::create(['name' => 'Perifericos']);
-        Category::create(['name' => 'Audio']);
-        Category::create(['name' => 'Combos']);
+        Category::create([
+            'name' => 'Tarjetas de video',
+            'slug' => Str::slug('Tarjetas de video'),
+        ]);
+
+        Category::create([
+            'name' => 'Motherboards',
+            'slug' => Str::slug('Motherboards'),
+        ]);
+
+        Category::create([
+            'name' => 'Monitores',
+            'slug' => Str::slug('Monitores'),
+        ]);
+
+        Category::create([
+            'name' => 'Perifericos',
+            'slug' => Str::slug('Perifericos'),
+        ]);
+
+        Category::create([
+            'name' => 'Audio',
+            'slug' => Str::slug('Audio'),
+        ]);
+
+        Category::create([
+            'name' => 'Combos',
+            'slug' => Str::slug('Combos'),
+        ]);
     }
 }
