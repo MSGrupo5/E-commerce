@@ -18,7 +18,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'direccion_entrega',
+        'direccion_entrega', // Agregado para MSGRUP-50
     ];
 
     protected $hidden = [
