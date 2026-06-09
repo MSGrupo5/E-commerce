@@ -8,7 +8,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/products', [ProductController::class, 'index'])->name('products.index'); // Ruta para mostrar la lista de productos
+Route::get('/productos', [ProductController::class, 'index'])->name('products.index'); // Ruta para mostrar la lista de productos
 
 Route::get('/dashboard', function () {
     return view('dashboard');
