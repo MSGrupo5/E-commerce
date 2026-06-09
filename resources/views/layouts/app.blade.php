@@ -106,7 +106,7 @@
                                 <form method="post" action="{{ route('logout') }}">
                                     @csrf
                                     <x-dropdown-link :href="route('logout')"
-                                        onclick="event.preventdefault(); this.closest('form').submit();"
+                                        onclick="event.preventDefault(); this.closest('form').submit();"
                                         class="text-error hover:bg-error/10">
                                         {{ __('cerrar sesión') }}
                                     </x-dropdown-link>
