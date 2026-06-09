@@ -41,14 +41,17 @@ Route::get('/carrito', function () {
 
 
 // Login
+
 Route::get('/login', function () {
     return view('auth.login');
-});
+})->name('login');
+
 
 Route::post('/login', function () {
     // Simulación de login
     return redirect('/')->with('success', 'Inicio de sesión correcto (simulado)');
 });
+
 
 // Registro
 Route::get('/register', function () {
@@ -59,3 +62,13 @@ Route::post('/register', function () {
     // Simulación de registro
     return redirect('/')->with('success', 'Usuario registrado correctamente (simulado)');
 });
+
+// Olvidé mi contraseña
+
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->name('password.request');
+
+Route::post('/forgot-password', function () {
+    return back()->with('status', 'Vista de recuperación disponible (sin envío real todavía).');
+})->name('password.email');

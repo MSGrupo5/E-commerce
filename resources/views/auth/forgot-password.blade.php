@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Recuperar contraseña</title>
 
-    {{-- Si usas Vite con Laravel --}}
     @vite('resources/css/app.css')
 </head>
 <body class="min-h-screen flex flex-col bg-gray-100 text-gray-900">
@@ -22,12 +21,23 @@
         </nav>
     </header>
 
-    <!-- Contenido principal -->
+    <!-- Contenido -->
     <main class="flex-1 flex items-center justify-center p-6">
         <div class="w-full max-w-md bg-white shadow-md rounded-lg p-8">
-            <h2 class="text-2xl font-bold mb-6 text-center">Iniciar sesión</h2>
+            <h2 class="text-2xl font-bold mb-4 text-center">Recuperar contraseña</h2>
 
-            {{-- Mostrar errores si existen --}}
+            <p class="text-sm text-gray-600 text-center mb-6">
+                Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+            </p>
+
+            {{-- Mensaje de éxito --}}
+            @if (session('status'))
+                <div class="mb-4 rounded-lg bg-green-100 p-3 text-green-700 text-sm">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            {{-- Errores --}}
             @if ($errors->any())
                 <div class="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
                     <ul class="list-disc list-inside text-sm">
@@ -38,10 +48,9 @@
                 </div>
             @endif
 
-            <form action="/login" method="POST" class="space-y-4">
+            <form action="{{ route('password.email') }}" method="POST" class="space-y-4">
                 @csrf
 
-                <!-- Email -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
                         Correo electrónico
@@ -51,50 +60,26 @@
                         id="email"
                         name="email"
                         value="{{ old('email') }}"
+                        required
                         autocomplete="email"
-                        required
+                        autofocus
                         class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 outline-none"
                     >
                 </div>
 
-                <!-- Contraseña -->
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label for="password" class="block text-sm font-medium text-gray-700">
-                            Contraseña
-                        </label>
-
-                        <a href="{{ route('password.request') }}" class="text-sm text-violet-600 hover:underline">
-                            ¿Olvidaste tu contraseña?
-                        </a>
-                    </div>
-
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        autocomplete="current-password"
-                        required
-                        class="w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 outline-none"
-                    >
-                </div>
-
-                <!-- Botón -->
                 <div>
                     <button
                         type="submit"
                         class="w-full bg-violet-600 text-white py-3 px-4 rounded-lg hover:bg-violet-700 transition"
                     >
-                        Iniciar sesión
+                        Enviar enlace de recuperación
                     </button>
                 </div>
             </form>
 
-            <!-- Enlace a registro -->
             <p class="text-center text-sm text-gray-600 mt-6">
-                ¿No tienes cuenta?
-                <a href="/register" class="text-blue-600 font-semibold hover:underline">
-                    Crear una nueva cuenta
+                <a href="{{ route('login') }}" class="text-violet-600 font-semibold hover:underline">
+                    Volver al inicio de sesión
                 </a>
             </p>
         </div>
