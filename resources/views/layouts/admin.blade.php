@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechStore - Panel de Administración</title>
+    <title>NexusTech - Panel de Administración</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +33,7 @@
                     <rect x="9" y="9" width="6" height="6" />
                     <path d="m9 1v3m6-3v3m-9 16v3m6-3v3m-11-13h3m-3 6h3m16-6h3m-3 6h3" />
                 </svg>
-                <span>Tech<span class="text-text">Store</span></span>
+                <span>Nexus<span class="text-text">Tech</span></span>
             </div>
             <button @click="mobilemenuopen = false" class="lg:hidden text-muted hover:text-text focus:outline-none">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
