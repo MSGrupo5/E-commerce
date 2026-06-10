@@ -17,10 +17,10 @@
 
         <div class="flex rounded-xl p-1 mb-8 bg-surface border border-border">
             <a href="{{ route('login') }}"
-                class="flex-1 py-2.5 rounded-lg text-small font-semibold text-center transition-all bg-primary text-text font-jakarta">iniciar
-                sesión</a>
+                class="flex-1 py-2.5 rounded-lg text-small font-semibold text-center transition-all bg-primary text-text font-jakarta">Iniciar
+                Sesión</a>
             <a href="{{ route('register') }}"
-                class="flex-1 py-2.5 rounded-lg text-small font-semibold text-center transition-all bg-transparent text-muted hover:text-text font-jakarta">registrarse</a>
+                class="flex-1 py-2.5 rounded-lg text-small font-semibold text-center transition-all bg-transparent text-muted hover:text-text font-jakarta">Registrarse</a>
         </div>
 
         <div class="rounded-2xl p-6 bg-surface border border-border">
@@ -32,7 +32,7 @@
                         class="block text-small font-semibold text-muted mb-1.5 font-jakarta">Email</label>
                     <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
                         class="w-full bg-surface border border-border rounded-xl px-4 text-text text-h6 outline-none font-jakarta focus:border-primary transition-all"
-                        style="padding-top: 13px; padding-bottom: 13px;" placeholder="tu@email.com">
+                        style="padding-top: 13px; padding-bottom: 13px;" placeholder="tuemail@gmail.com">
                     <x-input-error :messages="$errors->get('email')" class="mt-2 text-error text-label" />
                 </div>
 
@@ -63,7 +63,8 @@
 
                             </button>
                         
-                        </input>    
+                        </input>
+
                     </div>
                     <x-input-error :messages="$errors->get('password')" class="mt-2 text-error text-label" />
                 </div>
