@@ -1,85 +1,103 @@
 <x-guest-layout>
 
-    <!-- Encabezado del Formulario -->
+    <div class="-my-4 -mx-6 p-8 bg-surface border border-border rounded-lg">
 
-    <div class="mb-6 text-center">
+        <!-- Header -->
 
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
+        <div class="text-center space-y-3 mb-8">
 
-            {{ __('Restablecer Contraseña') }}
+            <h2 class="font-oxanium text-h2 text-text font-bold tracking-tight">
 
-        </h2>
+                {{ __('Restablecer Contraseña') }}
 
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            </h2>
 
-            {{ __('Por favor, ingresá tu nueva contraseña técnica a continuación.') }}
+            <p class="font-jakarta text-body text-muted leading-relaxed">
 
-        </p>
+                {{ __('Por favor, ingresá tu nueva contraseña técnica a continuación.') }}
+
+            </p>
+
+        </div>
+
+        <form method="POST" action="{{ route('password.store') }}" class="space-y-6">
+
+            @csrf
+
+            <!-- Token de Restablecimiento (Obligatorio para Laravel) -->
+
+            <input type="hidden" name="token" value="{{ $request->route('token') }}">
+
+            <!-- Correo Electrónico -->
+
+            <div>
+
+                <x-input-label for="email" :value="__('Correo Electrónico')"
+
+                    class="font-jakarta text-label text-text font-semibold mb-2 block" />
+
+                <x-text-input id="email"
+
+                    class="block w-full bg-background border-border text-text placeholder:text-muted rounded-lg shadow-sm focus:ring-primary focus:border-primary transition duration-150 ease-in-out"
+
+                    type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
+
+                <x-input-error :messages="$errors->get('email')" class="mt-2 font-jakarta text-small" />
+
+            </div>
+
+            <!-- Nueva Contraseña -->
+
+            <div>
+
+                <x-input-label for="password" :value="__('Nueva Contraseña')"
+
+                    class="font-jakarta text-label text-text font-semibold mb-2 block" />
+
+                <x-text-input id="password"
+
+                    class="block w-full bg-background border-border text-text placeholder:text-muted rounded-lg shadow-sm focus:ring-primary focus:border-primary transition duration-150 ease-in-out"
+
+                    type="password" name="password" required autocomplete="new-password" />
+
+                <x-input-error :messages="$errors->get('password')" class="mt-2 font-jakarta text-small" />
+
+            </div>
+
+            <!-- Confirmar Nueva Contraseña -->
+
+            <div>
+
+                <x-input-label for="password_confirmation" :value="__('Confirmar Nueva Contraseña')"
+
+                    class="font-jakarta text-label text-text font-semibold mb-2 block" />
+
+                <x-text-input id="password_confirmation"
+
+                    class="block w-full bg-background border-border text-text placeholder:text-muted rounded-lg shadow-sm focus:ring-primary focus:border-primary transition duration-150 ease-in-out"
+
+                    type="password" name="password_confirmation" required autocomplete="new-password" />
+
+                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2 font-jakarta text-small" />
+
+            </div>
+
+            <!-- Botón de Acción de Ancho Completo -->
+
+            <div>
+
+                <x-primary-button
+
+                    class="w-full justify-center py-3.5 font-jakarta text-small font-bold uppercase tracking-widest bg-primary hover:opacity-90 active:opacity-80 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface rounded-lg shadow-lg transition-all duration-150 ease-in-out">
+
+                    {{ __('Actualizar Contraseña') }}
+
+                </x-primary-button>
+
+            </div>
+
+        </form>
 
     </div>
-
-
-    <form method="POST" action="{{ route('password.store') }}">
-
-        @csrf
-
-
-        <!-- Token de Restablecimiento (Obligatorio para Laravel) -->
-
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
-
-
-        <!-- Correo Electrónico -->
-
-        <div>
-
-            <x-input-label for="email" :value="__('Correo Electrónico')" class="font-medium text-gray-700 dark:text-gray-300" />
-
-            <x-text-input id="email" class="block mt-1 w-full bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-
-        </div>
-
-
-        <!-- Nueva Contraseña -->
-
-        <div class="mt-4">
-
-            <x-input-label for="password" :value="__('Nueva Contraseña')" class="font-medium text-gray-700 dark:text-gray-300" />
-
-            <x-text-input id="password" class="block mt-1 w-full border-gray-300 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm" type="password" name="password" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-
-        </div>
-
-
-        <!-- Confirmar Nueva Contraseña -->
-
-        <div class="mt-4">
-
-            <x-input-label for="password_confirmation" :value="__('Confirmar Nueva Contraseña')" class="font-medium text-gray-700 dark:text-gray-300" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full border-gray-300 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm" type="password" name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-
-        </div>
-
-
-        <!-- Botón de Acción de Ancho Completo -->
-
-        <div class="mt-6">
-
-            <x-primary-button class="w-full justify-center py-2.5 text-sm font-semibold tracking-wider uppercase transition duration-150 ease-in-out bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-900 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900 rounded-lg shadow-md">
-
-                {{ __('Actualizar Contraseña') }}
-
-            </x-primary-button>
-
-        </div>
-
-    </form>
 
 </x-guest-layout>
