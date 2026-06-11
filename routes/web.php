@@ -24,4 +24,8 @@ Route::get('/app', function () {
     return view('layouts.app', ['slot' => '']);
 });
 
+Route::get('login', function () {
+    return view('auth.login');
+});
+
 require __DIR__.'/auth.php';

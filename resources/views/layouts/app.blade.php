@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'techstore') }}</title>
+    <title>{{ config('app.name', 'NexusTech') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +30,7 @@
                         d="m3.75 13.5l10.5-11.25l-2.25 9h7.5l-10.5 11.25l2.25-9h-7.5z" />
                 </svg>
                 <span class="font-oxanium font-bold text-base md:text-lg tracking-widest text-text">
-                    TechStore
+                    NexusTech
                 </span>
             </a>
 
@@ -178,7 +178,7 @@
     </header>
 
     <main class="flex-1 w-full max-w-screen-xl mx-auto px-4 md:px-8 py-6 md:py-10">
-        {{ $slot }}
+        @yield('content')
     </main>
 
     <footer class="bg-background border-t border-border">
