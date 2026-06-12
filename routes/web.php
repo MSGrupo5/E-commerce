@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserCatalogController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,5 +31,11 @@ Route::get('login', function () {
 
 Route::get('/productos/{product}', [ProductController::class, 'show'])
     ->name('products.show');
+
+Route::middleware('auth')->prefix('profile/catalog')->name('profile.catalog.')->group(function () {
+    Route::post('/', [UserCatalogController::class, 'store'])->name('store');
+    Route::patch('/{product}', [UserCatalogController::class, 'update'])->name('update');
+    Route::delete('/{product}', [UserCatalogController::class, 'destroy'])->name('destroy');
+});
 
 require __DIR__ . '/auth.php';
