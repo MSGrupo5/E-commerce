@@ -15,6 +15,7 @@ class Order extends Model
         'user_id',
         'total',
         'status',
+        'shipping_address',
     ];
 
     protected function casts(): array
