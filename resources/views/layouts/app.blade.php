@@ -178,7 +178,7 @@
     </header>
 
     <main class="flex-1 w-full max-w-screen-xl mx-auto px-4 md:px-8 py-6 md:py-10">
-        @yield('content')
+        {{ $slot }}
     </main>
 
     <footer class="bg-background border-t border-border">
