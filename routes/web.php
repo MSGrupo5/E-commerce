@@ -28,4 +28,7 @@ Route::get('login', function () {
     return view('auth.login');
 });
 
-require __DIR__.'/auth.php';
+Route::get('/productos/{product}', [ProductController::class, 'show'])
+    ->name('products.show');
+
+require __DIR__ . '/auth.php';
