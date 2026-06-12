@@ -15,6 +15,13 @@ class Cart extends Model
         'user_id',
     ];
 
+    // --- Métodos estáticos ---
+
+    public static function getOrCreate(\App\Models\User $user): self
+    {
+        return self::firstOrCreate(['user_id' => $user->id]);
+    }
+
     // --- Relaciones ---
 
     public function user(): BelongsTo
