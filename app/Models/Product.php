@@ -13,6 +13,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'category_id',
         'name',
         'description',
@@ -45,6 +46,11 @@ class Product extends Model
     }
 
     // --- Relaciones ---
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function category(): BelongsTo
     {
