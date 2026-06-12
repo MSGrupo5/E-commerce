@@ -10,8 +10,17 @@ class ProductController extends Controller
 {
     public function index()
     {
-         $products = Product::with('category')->paginate(12);   // trae los productos con su categoría y los pagina de 12 en 12
-         return view('products.index', ['products' => $products]);
+        $products = Product::with('category')->paginate(12);   // trae los productos con su categoría y los pagina de 12 en 12
+        return view('products.index', ['products' => $products]);
+    }
+
+    public function show(Product $product)
+    {
+        if (!$product->is_active) {
+            abort(404);
+        }
+
+        return view('products.show', compact('product'));
     }
 
 }
