@@ -25,6 +25,9 @@ class ProductFactory extends Factory
 
             // relacion con categoría
             'category_id' => Category::inRandomOrder()->first()->id,
+
+            // activar productos
+            'is_active' => true,
         ];
     }
 }
