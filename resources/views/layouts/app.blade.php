@@ -62,7 +62,7 @@
                     <span class="hidden md:inline text-sm font-medium">Favoritos</span>
                 </a>
 
-                <a href="/cart"
+                <a href="{{ route('cart.index') }}"
                     class="flex items-center gap-2 text-muted hover:text-text transition-colors relative group">
                     <div class="relative">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
@@ -178,6 +178,27 @@
     </header>
 
     <main class="flex-1 w-full max-w-screen-xl mx-auto px-4 md:px-8 py-6 md:py-10">
+        @if(session('cart_success') && !request()->routeIs('cart.*'))
+        <div x-data="{ show: true }" x-show="show" x-cloak
+            x-init="setTimeout(() => show = false, 4500)"
+            class="fixed top-20 right-4 z-[100] max-w-sm w-full rounded-2xl border border-primary/30 bg-surface px-5 py-4 shadow-2xl">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20">
+                    <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-xs text-muted">{{ session('cart_success') }}</p>
+                </div>
+                <button type="button" @click="show = false" class="ml-auto text-muted hover:text-text transition-colors">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        @endif
         {{ $slot }}
     </main>
 

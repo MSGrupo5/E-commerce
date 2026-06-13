@@ -3,11 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
+    public function index()
+    {
+        $cart = Cart::with('items.product.category')
+            ->where('user_id', request()->user()->id)
+            ->first();
+
+        return view('cart.index', compact('cart'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -15,7 +25,9 @@ class CartController extends Controller
             'quantity'   => 'required|integer|min:1',
         ]);
 
-        $cart = Cart::getOrCreate(auth()->user());
+        $user = request()->user();
+
+        $cart = Cart::getOrCreate($user);
 
         $item = $cart->items()->firstOrNew([
             'product_id' => $validated['product_id'],
@@ -34,6 +46,38 @@ class CartController extends Controller
         $item->quantity = $newQuantity;
         $item->save();
 
-        return back()->with('success', 'Producto agregado al carrito con éxito.');
+        return back()->with('cart_success', 'Producto agregado al carrito con éxito.');
+    }
+
+    public function update(Request $request, CartItem $cartItem)
+    {
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        if ($cartItem->cart->user_id !== request()->user()->id) {
+            abort(403);
+        }
+
+        if ($validated['quantity'] > $cartItem->product->stock) {
+            return back()->withErrors([
+                'quantity' => 'El stock es insuficiente.',
+            ]);
+        }
+
+        $cartItem->update(['quantity' => $validated['quantity']]);
+
+        return back()->with('cart_success', 'Cantidad actualizada.');
+    }
+
+    public function destroy(CartItem $cartItem)
+    {
+        if ($cartItem->cart->user_id !== request()->user()->id) {
+            abort(403);
+        }
+
+        $cartItem->delete();
+
+        return back()->with('cart_success', 'Producto eliminado del carrito.');
     }
 }
