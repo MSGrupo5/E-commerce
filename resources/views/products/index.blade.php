@@ -50,7 +50,16 @@
                         <x-ui.product-card :product="$product" :isFavorite="false" />
                     @empty
                         <div class="col-span-full rounded-3xl border border-border bg-surface p-8 text-center">
-                            <p class="text-base font-medium text-text">No hay productos disponibles en este momento.</p>
+                            @if (request('q'))
+                                <p class="text-base font-medium text-text">
+                                    No se encontraron productos para <span class="text-primary">"{{ request('q') }}"</span>
+                                </p>
+                                <a href="{{ route('products.index') }}" class="mt-3 inline-block text-sm font-medium text-primary hover:underline">
+                                    &larr; Ver todos los productos
+                                </a>
+                            @else
+                                <p class="text-base font-medium text-text">No hay productos disponibles en este momento.</p>
+                            @endif
                         </div>
                     @endforelse
                 </div>
