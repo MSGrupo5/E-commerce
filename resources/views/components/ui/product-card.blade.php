@@ -74,6 +74,7 @@
                 <form action="{{ route('cart.add') }}" method="POST">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <input type="hidden" name="quantity" value="1">
                     <button type="submit" class="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-background transition hover:bg-primary/90">
                         Agregar al carrito
                     </button>

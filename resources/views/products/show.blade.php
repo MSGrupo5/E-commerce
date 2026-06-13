@@ -57,9 +57,14 @@
 
                 <div class="space-y-3">
                     @if($product->stock > 0)
-                        <button type="button" class="w-full rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-background transition hover:bg-primary/90">
-                            Agregar al carrito
-                        </button>
+                        <form action="{{ route('cart.add') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="w-full rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-background transition hover:bg-primary/90">
+                                Agregar al carrito
+                            </button>
+                        </form>
                     @else
                         <button type="button" disabled class="w-full rounded-2xl bg-border px-5 py-4 text-base font-semibold text-muted cursor-not-allowed">
                             Sin stock
