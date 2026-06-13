@@ -5,9 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserCatalogController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [ProductController::class, 'index'])->name('home');
 
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index'); // Ruta para mostrar la lista de productos
 
@@ -29,8 +27,15 @@ Route::get('login', function () {
     return view('auth.login');
 });
 
+Route::get('/search', [ProductController::class, 'search'])
+    ->name('products.search');
+
 Route::get('/productos/{product}', [ProductController::class, 'show'])
     ->name('products.show');
+
+Route::get('/catalog', function () {
+    return redirect()->route('products.index');
+})->name('catalog');
 
 Route::middleware('auth')->prefix('profile/catalog')->name('profile.catalog.')->group(function () {
     Route::post('/', [UserCatalogController::class, 'store'])->name('store');

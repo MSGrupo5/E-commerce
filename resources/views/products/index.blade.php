@@ -31,7 +31,7 @@
                     </button>
 
                     <div x-cloak x-show="mobileFilterOpen" x-transition class="mt-3">
-                        <x-ui.category-filter :frontOnly="true" />
+                        <x-ui.category-filter :categories="$categories" :categorySlug="$categorySlug" :frontOnly="false" />
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
         {{-- Main layout: sidebar + product grid --}}
         <div class="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
             <aside class="hidden lg:block">
-                <x-ui.category-filter :frontOnly="true" />
+                <x-ui.category-filter :categories="$categories" :categorySlug="$categorySlug" :frontOnly="false" />
             </aside>
 
             <div class="space-y-4">
@@ -50,7 +50,16 @@
                         <x-ui.product-card :product="$product" :isFavorite="false" />
                     @empty
                         <div class="col-span-full rounded-3xl border border-border bg-surface p-8 text-center">
-                            <p class="text-base font-medium text-text">No hay productos disponibles en este momento.</p>
+                            @if (request('q'))
+                                <p class="text-base font-medium text-text">
+                                    No se encontraron productos para <span class="text-primary">"{{ request('q') }}"</span>
+                                </p>
+                                <a href="{{ route('products.index') }}" class="mt-3 inline-block text-sm font-medium text-primary hover:underline">
+                                    &larr; Ver todos los productos
+                                </a>
+                            @else
+                                <p class="text-base font-medium text-text">No hay productos disponibles en este momento.</p>
+                            @endif
                         </div>
                     @endforelse
                 </div>
