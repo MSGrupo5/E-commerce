@@ -31,7 +31,7 @@
                     </button>
 
                     <div x-cloak x-show="mobileFilterOpen" x-transition class="mt-3">
-                        <x-ui.category-filter :frontOnly="true" />
+                        <x-ui.category-filter :categories="$categories" :categorySlug="$categorySlug" :frontOnly="false" />
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
         {{-- Main layout: sidebar + product grid --}}
         <div class="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
             <aside class="hidden lg:block">
-                <x-ui.category-filter :frontOnly="true" />
+                <x-ui.category-filter :categories="$categories" :categorySlug="$categorySlug" :frontOnly="false" />
             </aside>
 
             <div class="space-y-4">
