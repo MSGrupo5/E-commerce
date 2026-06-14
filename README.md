@@ -24,6 +24,15 @@
 
 ---
 
+## Credenciales de prueba
+
+| Rol    | Email                  | Contraseña |
+|--------|------------------------|------------|
+| Admin  | admin@ecommerce.com    | password   |
+| Cliente| test@example.com       | password   |
+
+Para resetear la base de datos: `php artisan migrate:fresh --seed`
+
 ## Requisitos Previos
 
 - **PHP** >= 8.2
