@@ -10,10 +10,6 @@ Route::get('/', [ProductController::class, 'index'])->name('home');
 
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index'); // Ruta para mostrar la lista de productos
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'admin'])->name('dashboard');
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -25,13 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
 });
 
-// Route::get('/app', function () {
-//     return view('layouts.app', ['slot' => '']); // tambien me parece una ruta innecesaria.
-// });
 
-Route::get('login', function () {
-    return view('auth.login');
-});
 
 Route::get('/search', [ProductController::class, 'search'])
     ->name('products.search');
@@ -49,5 +39,13 @@ Route::middleware('auth')->prefix('profile/catalog')->name('profile.catalog.')->
     Route::patch('/{product}', [UserCatalogController::class, 'update'])->name('update');
     Route::delete('/{product}', [UserCatalogController::class, 'destroy'])->name('destroy');
 });
+
+Route::prefix('admin')
+    ->middleware(['auth', 'admin'])
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
+            ->name('dashboard');
+    });
 
 require __DIR__ . '/auth.php';
