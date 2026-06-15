@@ -13,7 +13,7 @@ class DashboardAccessTest extends TestCase
     public function test_non_admin_user_cannot_access_dashboard()
     {
         /** @var User $user */
-        $user = User::factory()->create(['role' => 'cliente']);
+        $user = User::factory()->create(['role' => 'usuario']);
 
         $response = $this->actingAs($user)->get('/admin/dashboard');
 

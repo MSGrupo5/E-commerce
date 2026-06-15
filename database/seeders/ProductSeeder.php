@@ -16,7 +16,7 @@ class ProductSeeder extends Seeder
         for ($i = 1; $i <= 3; $i++) {
             $sellers[] = User::factory()->create([
                 'name' => "Vendedor $i",
-                'role' => 'cliente',
+                'role' => 'usuario',
             ]);
         }
 
