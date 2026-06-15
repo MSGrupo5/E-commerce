@@ -38,13 +38,12 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Creamos el usuario con su apellido y forzamos el rol 'cliente' (MSGRUP-39)
         $user = User::create([
             'name' => $request->name,
             'apellido' => $request->apellido,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'cliente',
+            'role' => 'usuario',
         ]);
 
         event(new Registered($user));

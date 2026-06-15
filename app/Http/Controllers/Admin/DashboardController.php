@@ -14,12 +14,12 @@ class DashboardController extends Controller
     {
         $totalProductos = Product::count();
         $totalPedidos   = Order::count();
-        $totalClientes  = User::where('role', 'cliente')->count();
+        $totalUsuarios  = User::where('role', 'usuario')->count();
 
         return view('admin.dashboard', compact(
             'totalProductos',
             'totalPedidos',
-            'totalClientes',
+            'totalUsuarios',
         ));
     }
 }

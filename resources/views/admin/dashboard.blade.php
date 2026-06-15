@@ -47,8 +47,8 @@
                 </svg>
             </div>
             <div>
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted">Clientes</p>
-                <p class="text-h3 font-bold text-text font-oxanium">{{ $totalClientes }}</p>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted">Usuarios</p>
+                <p class="text-h3 font-bold text-text font-oxanium">{{ $totalUsuarios }}</p>
             </div>
         </div>
     </div>

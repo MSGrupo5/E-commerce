@@ -19,11 +19,11 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_cliente_no_puede_ver_dashboard()
+    public function test_usuario_no_puede_ver_dashboard()
     {
-        $cliente = User::factory()->create(['role' => 'cliente']);
+        $usuario = User::factory()->create(['role' => 'usuario']);
 
-        $response = $this->actingAs($cliente)->get('/admin/dashboard');
+        $response = $this->actingAs($usuario)->get('/admin/dashboard');
 
         $response->assertStatus(403);
     }

@@ -42,9 +42,9 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function isCliente(): bool
+    public function isUsuario(): bool
     {
-        return $this->role === 'cliente';
+        return $this->role === 'usuario';
     }
 
     // --- Relaciones ---
