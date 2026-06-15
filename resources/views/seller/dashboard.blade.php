@@ -19,7 +19,7 @@
             </div>
             <div>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted">Productos publicados</p>
-                <p class="text-h3 font-bold text-text font-oxanium">{{ $totalProductos }}</p>
+                <p class="text-h3 font-bold text-text font-oxanium">{{ $productsCount }}</p>
             </div>
         </div>
 
@@ -33,7 +33,7 @@
             </div>
             <div>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted">Pedidos recibidos</p>
-                <p class="text-h3 font-bold text-text font-oxanium">{{ $totalPedidos }}</p>
+                <p class="text-h3 font-bold text-text font-oxanium">{{ $salesCount }}</p>
             </div>
         </div>
     </div>

@@ -102,6 +102,12 @@
                                     class="block px-4 py-2 text-sm leading-5 text-text hover:bg-background transition duration-150 ease-in-out">
                                     Mi Panel
                                 </a>
+                                @if(auth()->user()->isAdmin())
+                                    <a href="{{ route('admin.dashboard') }}"
+                                        class="block px-4 py-2 text-sm leading-5 text-text hover:bg-background transition duration-150 ease-in-out">
+                                        Panel Admin
+                                    </a>
+                                @endif
                                 <a href="/orders"
                                     class="block px-4 py-2 text-sm leading-5 text-text hover:bg-background transition duration-150 ease-in-out">
                                     Mis pedidos

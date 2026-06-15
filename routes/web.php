@@ -28,14 +28,16 @@ Route::middleware('auth')->group(function () {
     Route::patch('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
 
-    Route::prefix('mi-panel')->name('seller.')->group(function () {
+});
+
+Route::prefix('panel')
+    ->middleware('auth')
+    ->name('seller.')
+    ->group(function () {
         Route::get('/', [App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('dashboard');
         Route::resource('productos', App\Http\Controllers\Seller\ProductController::class)->parameters(['productos' => 'product']);
         Route::get('pedidos', [App\Http\Controllers\Seller\OrderController::class, 'index'])->name('orders');
     });
-});
-
-
 
 Route::get('/search', [ProductController::class, 'search'])
     ->name('products.search');
