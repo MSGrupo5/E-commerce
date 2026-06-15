@@ -53,6 +53,9 @@
             <a href="{{ Route::has('products.show') ? route('products.show', $product) : url('/products/'.$product->id) }}" class="block text-base font-semibold text-text leading-snug hover:text-primary transition-colors">
                 {{ $product->name }}
             </a>
+            @if($product->relationLoaded('seller') && $product->seller)
+                <p class="text-xs text-muted mt-1">por <span class="text-text/70 font-medium">{{ $product->seller->name }}</span></p>
+            @endif
         </div>
 
         <div class="flex items-center justify-between gap-3">

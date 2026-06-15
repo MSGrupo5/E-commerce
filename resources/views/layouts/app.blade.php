@@ -35,14 +35,14 @@
             </a>
 
             <div class="hidden md:block flex-1 max-w-xl">
-                <form action="/search" method="get"
+                <form action="/productos" method="get"
                     class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-background border border-border">
                     <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" stroke-width="2"
                         viewbox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="m21 21l-5.197-5.197m0 0a7.5 7.5 0 10-10.518-10.518 7.5 7.5 0 0010.518 10.518z" />
                     </svg>
-                    <input type="text" name="q" placeholder="Buscar laptops, smartphones, auriculares..."
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar productos..."
                         class="bg-transparent text-sm outline-none w-full text-text placeholder-muted">
                 </form>
             </div>
@@ -176,14 +176,14 @@
         </div>
 
         <div class="block md:hidden px-4 pb-3">
-            <form action="/search" method="get"
+            <form action="/productos" method="get"
                 class="flex items-center gap-2 px-3 py-2 rounded-lg bg-background border border-border">
                 <svg class="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" stroke-width="2"
                     viewbox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="m21 21l-5.197-5.197m0 0a7.5 7.5 0 10-10.518-10.518 7.5 7.5 0 0010.518 10.518z" />
                 </svg>
-                <input type="text" name="q" placeholder="buscar productos..."
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar productos..."
                     class="bg-transparent text-sm outline-none w-full text-text placeholder-muted">
             </form>
         </div>
