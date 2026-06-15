@@ -18,6 +18,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_active',
         'direccion_entrega', // Agregado para MSGRUP-50
     ];
 

@@ -19,7 +19,7 @@
 
 <body class="font-jakarta bg-background text-text antialiased min-h-screen flex flex-col justify-between">
 
-    <header class="w-full sticky top-0 z-50 bg-surface border-b border-border">
+    <header class="w-full sticky top-0 z-50 bg-nav border-b border-border/30">
 
         <div class="max-w-screen-xl mx-auto px-4 md:px-8 h-14 md:h-16 flex items-center justify-between gap-6">
 
