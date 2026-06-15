@@ -3,12 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        return view('admin.dashboard');
+        $totalProductos = Product::count();
+        $totalPedidos   = Order::count();
+        $totalClientes  = User::where('role', 'cliente')->count();
+
+        return view('admin.dashboard', compact(
+            'totalProductos',
+            'totalPedidos',
+            'totalClientes',
+        ));
     }
 }
