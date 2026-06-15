@@ -14,10 +14,7 @@ class ProductController extends Controller
         $query = $request->input('q');
         $categorySlug = $request->input('category');
 
-        $categories = Category::withCount('products')
-            ->orderBy('name')
-            ->get();
-
+        $categories = Category::withCount('products')->get();
 
         $products = Product::with('category')
             ->when($query, fn($q) => $q->search($query))
