@@ -15,7 +15,7 @@ class DashboardAccessTest extends TestCase
         /** @var User $user */
         $user = User::factory()->create(['role' => 'cliente']);
 
-        $response = $this->actingAs($user)->get('/dashboard');
+        $response = $this->actingAs($user)->get('/admin/dashboard');
 
         $response->assertForbidden();
     }
@@ -25,7 +25,7 @@ class DashboardAccessTest extends TestCase
         /** @var User $user */
         $user = User::factory()->create(['role' => 'admin']);
 
-        $response = $this->actingAs($user)->get('/dashboard');
+        $response = $this->actingAs($user)->get('/admin/dashboard');
 
         $response->assertOk();
     }
