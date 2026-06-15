@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
 
-Route::get('/productos', [ProductController::class, 'index'])->name('products.index'); // Ruta para mostrar la lista de productos
+Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
 
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
@@ -16,6 +16,16 @@ Route::prefix('admin')
     ->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
             ->name('dashboard');
+
+        Route::resource('productos', App\Http\Controllers\Admin\ProductController::class)
+            ->parameters(['productos' => 'product'])
+            ->only(['index', 'destroy']);
+
+        Route::get('usuarios', [App\Http\Controllers\Admin\UserController::class, 'index'])
+            ->name('users.index');
+
+        Route::patch('usuarios/{user}/toggle', [App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])
+            ->name('users.toggle');
     });
 
 Route::middleware('auth')->group(function () {
@@ -45,23 +55,10 @@ Route::get('/search', [ProductController::class, 'search'])
 Route::get('/productos/{product}', [ProductController::class, 'show'])
     ->name('products.show');
 
-// Route::get('/catalog', function () {
-//     return redirect()->route('products.index');    me parece que esta de mas
-// })->name('catalog');
-
-// Rutas para el catálogo del usuario (agregar, editar, eliminar productos del catálogo personal)
 Route::middleware('auth')->prefix('profile/catalog')->name('profile.catalog.')->group(function () {
     Route::post('/', [UserCatalogController::class, 'store'])->name('store');
     Route::patch('/{product}', [UserCatalogController::class, 'update'])->name('update');
     Route::delete('/{product}', [UserCatalogController::class, 'destroy'])->name('destroy');
 });
-
-Route::prefix('admin')
-    ->middleware(['auth', 'admin'])
-    ->name('admin.')
-    ->group(function () {
-        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
-            ->name('dashboard');
-    });
 
 require __DIR__ . '/auth.php';

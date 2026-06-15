@@ -56,39 +56,23 @@
     <div>
         <h2 class="text-h4 font-oxanium font-bold text-text mb-4">Accesos rápidos</h2>
         <div class="flex flex-wrap gap-3">
-            @if(Route::has('admin.products.index'))
-                <a href="{{ route('admin.products.index') }}"
-                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-text font-medium text-small hover:bg-primary/90 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <rect x="4" y="4" width="16" height="16" rx="2" />
-                        <rect x="9" y="9" width="6" height="6" />
-                    </svg>
-                    Gestionar Productos
-                </a>
-            @endif
+            <a href="{{ route('admin.productos.index') }}"
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-text font-medium text-small hover:bg-primary/90 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                    <rect x="9" y="9" width="6" height="6" />
+                </svg>
+                Gestionar Productos
+            </a>
 
-            @if(Route::has('admin.orders.index'))
-                <a href="{{ route('admin.orders.index') }}"
-                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface border border-border text-text font-medium text-small hover:bg-background transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="8" cy="21" r="1" />
-                        <circle cx="19" cy="21" r="1" />
-                        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-                    </svg>
-                    Ver Pedidos
-                </a>
-            @endif
-
-            @if(Route::has('admin.clients.index'))
-                <a href="{{ route('admin.clients.index') }}"
-                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface border border-border text-text font-medium text-small hover:bg-background transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                        <circle cx="8" cy="7" r="4" />
-                    </svg>
-                    Gestionar Clientes
-                </a>
-            @endif
+            <a href="{{ route('admin.users.index') }}"
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface border border-border text-text font-medium text-small hover:bg-background transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="8" cy="7" r="4" />
+                </svg>
+                Gestionar Clientes
+            </a>
         </div>
     </div>
 @endsection
