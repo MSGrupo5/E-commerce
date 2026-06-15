@@ -11,12 +11,12 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = $request->input('q');
+        $query = $request->input('search');
         $categorySlug = $request->input('category');
 
         $categories = Category::withCount('products')->get();
 
-        $products = Product::with('category')
+        $products = Product::with('category', 'seller')
             ->when($query, fn($q) => $q->search($query))
             ->when($categorySlug, fn($q) => $q->whereHas('category', fn($cq) => $cq->where('slug', $categorySlug)))
             ->paginate(12);
@@ -35,13 +35,13 @@ class ProductController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->input('q');
+        $query = $request->input('search');
 
         if (blank($query)) {
             return redirect()->route('products.index');
         }
 
-        $products = Product::with('category')
+        $products = Product::with('category', 'seller')
             ->search($query)
             ->paginate(12);
 

@@ -50,9 +50,9 @@
                         <x-ui.product-card :product="$product" :isFavorite="false" />
                     @empty
                         <div class="col-span-full rounded-3xl border border-border bg-surface p-8 text-center">
-                            @if (request('q'))
+                            @if (request('search'))
                                 <p class="text-base font-medium text-text">
-                                    No se encontraron productos para <span class="text-primary">"{{ request('q') }}"</span>
+                                    No se encontraron productos para <span class="text-primary">"{{ request('search') }}"</span>
                                 </p>
                                 <a href="{{ route('products.index') }}" class="mt-3 inline-block text-sm font-medium text-primary hover:underline">
                                     &larr; Ver todos los productos
