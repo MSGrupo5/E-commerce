@@ -98,6 +98,16 @@
                                 <x-dropdown-link :href="route('profile.edit')" class="bg-surface text-text hover:bg-background">
                                     {{ __('mi perfil') }}
                                 </x-dropdown-link>
+                                <a href="{{ route('seller.dashboard') }}"
+                                    class="block px-4 py-2 text-sm leading-5 text-text hover:bg-background transition duration-150 ease-in-out">
+                                    Mi Panel
+                                </a>
+                                @if(auth()->user()->isAdmin())
+                                    <a href="{{ route('admin.dashboard') }}"
+                                        class="block px-4 py-2 text-sm leading-5 text-text hover:bg-background transition duration-150 ease-in-out">
+                                        Panel Admin
+                                    </a>
+                                @endif
                                 <a href="/orders"
                                     class="block px-4 py-2 text-sm leading-5 text-text hover:bg-background transition duration-150 ease-in-out">
                                     Mis pedidos
@@ -137,6 +147,8 @@
                         <x-slot name="content">
                             <a href="/catalog"
                                 class="block px-4 py-2 text-sm text-text hover:bg-background transition-colors">Catálogo</a>
+                            <a href="{{ route('seller.dashboard') }}"
+                                class="block px-4 py-2 text-sm text-text hover:bg-background transition-colors">Mi Panel</a>
                             <a href="/favorites"
                                 class="block px-4 py-2 text-sm text-text hover:bg-background transition-colors">Mis
                                 favoritos</a>

@@ -33,17 +33,6 @@
                         <span>Cambiar contraseña</span>
                     </button>
 
-                    <button type="button" @click="tab = 'catalog'"
-                        :class="tab === 'catalog'
-                            ? 'bg-primary/10 text-primary border-primary/30'
-                            : 'text-muted hover:text-text hover:bg-background border-transparent'"
-                        class="flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition-all">
-                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                        </svg>
-                        <span>Mi catálogo</span>
-                    </button>
-
                     <button type="button" @click="tab = 'delete'"
                         :class="tab === 'delete'
                             ? 'bg-error/10 text-error border-error/30'
@@ -81,12 +70,6 @@
                     <div class="max-w-xl">
                         @include('profile.partials.delete-user-form')
                     </div>
-                </div>
-            </div>
-
-            <div x-show="tab === 'catalog'" x-transition:enter="transition duration-200 ease-out" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
-                <div class="rounded-[32px] border border-border bg-surface p-6 sm:p-8 shadow-[0_24px_64px_rgba(0,0,0,0.25)]">
-                    @include('profile.partials.catalog-manager')
                 </div>
             </div>
         </div>
