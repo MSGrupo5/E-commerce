@@ -14,7 +14,7 @@
     </div>
 
     <div class="max-w-2xl rounded-3xl border border-border bg-surface p-6 md:p-8">
-        <form action="{{ isset($product) ? route('seller.productos.update', $product) : route('seller.productos.store') }}" method="POST">
+        <form action="{{ isset($product) ? route('seller.productos.update', $product) : route('seller.productos.store') }}" method="POST" enctype="multipart/form-data" x-data="{ preview: null }">
             @csrf
             @if(isset($product))
                 @method('PATCH')
@@ -69,10 +69,31 @@
                 </div>
 
                 <div>
-                    <label for="image" class="block text-small font-medium text-text mb-1.5">URL de imagen</label>
-                    <input type="url" id="image" name="image" value="{{ old('image', $product->image ?? '') }}"
-                        class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted"
-                        placeholder="https://ejemplo.com/imagen.jpg">
+                    <label class="block text-small font-medium text-text mb-1.5">Imagen del producto</label>
+                    @if(isset($product) && $product->image)
+                        <div class="mb-3">
+                            <p class="text-xs text-muted mb-2">Imagen actual:</p>
+                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-32 h-32 rounded-xl object-cover border border-border">
+                        </div>
+                    @endif
+                    <div class="flex items-center gap-4">
+                        <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-small text-muted hover:text-text hover:border-primary/50 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                            </svg>
+                            <span>Seleccionar archivo</span>
+                            <input type="file" id="image" name="image" accept="image/*"
+                                class="sr-only"
+                                @change="preview = URL.createObjectURL($event.target.files[0])">
+                        </label>
+                        <span class="text-xs text-muted">PNG, JPG hasta 2MB</span>
+                    </div>
+                    <template x-if="preview">
+                        <div class="mt-3">
+                            <p class="text-xs text-muted mb-2">Nueva imagen:</p>
+                            <img :src="preview" class="w-32 h-32 rounded-xl object-cover border border-border">
+                        </div>
+                    </template>
                     @error('image') <p class="text-error text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
