@@ -12,19 +12,21 @@ class DashboardAccessTest extends TestCase
 
     public function test_non_admin_user_cannot_access_dashboard()
     {
+        /** @var User $user */
         $user = User::factory()->create(['role' => 'cliente']);
 
         $response = $this->actingAs($user)->get('/dashboard');
 
-        $response->assertStatus(403);
+        $response->assertForbidden();
     }
 
     public function test_admin_user_can_access_dashboard()
     {
+        /** @var User $user */
         $user = User::factory()->create(['role' => 'admin']);
 
         $response = $this->actingAs($user)->get('/dashboard');
 
-        $response->assertStatus(200);
+        $response->assertOk();
     }
 }
