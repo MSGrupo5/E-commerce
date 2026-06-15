@@ -5,6 +5,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserCatalogController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CheckoutController;   
+
+
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
 
@@ -47,5 +50,13 @@ Route::prefix('admin')
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
             ->name('dashboard');
     });
+Route::middleware('auth')->group(function () {
+
+    Route::get('/checkout', [CheckoutController::class, 'show'])
+        ->name('checkout.show');
+
+    Route::post('/checkout', [CheckoutController::class, 'store'])
+        ->name('checkout.store');
+});
 
 require __DIR__ . '/auth.php';
