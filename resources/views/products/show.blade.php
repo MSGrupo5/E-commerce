@@ -7,22 +7,22 @@
             </div>
         </div>
 
-        <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] items-start">
-            <div class="rounded-[32px] border border-border bg-surface p-4 sm:p-6">
-                <div class="overflow-hidden rounded-[28px] bg-background">
+        <div class="grid gap-8 lg:grid-cols-5 items-start">
+            <div class="lg:col-span-3 rounded-3xl border border-border bg-surface p-4 sm:p-6">
+                <div class="overflow-hidden rounded-2xl bg-background">
                     <img
                         src="{{ $product->image }}"
                         alt="{{ $product->name }}"
-                        class="h-[420px] w-full object-contain object-center"
+                        class="h-64 sm:h-80 lg:h-96 w-full object-contain object-center"
                         onerror="this.src='https://via.placeholder.com/720x420?text=Sin+imagen'"
                     />
                 </div>
             </div>
 
-            <div class="space-y-6 rounded-[32px] border border-border bg-surface p-6 sm:p-8">
+            <div class="lg:col-span-2 space-y-6 rounded-3xl border border-border bg-surface p-6 sm:p-8">
                 <div class="flex flex-col gap-4">
                     <div class="flex items-center justify-between gap-4">
-                        <span class="inline-flex items-center rounded-full border border-border bg-background/80 px-3 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-muted">
+                        <span class="inline-flex items-center rounded-full border border-border bg-background/80 px-3 py-2 text-sm font-semibold uppercase tracking-widest text-muted">
                             {{ optional($product->category)->name ?? 'Sin categoría' }}
                         </span>
 
@@ -41,7 +41,7 @@
 
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <p class="text-3xl font-bold text-primary">${{ number_format($product->price, 0, ',', '.') }}</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-primary">${{ number_format($product->price, 0, ',', '.') }}</p>
                             <p class="mt-1 text-sm text-muted">Precio final</p>
                         </div>
                         <div class="rounded-3xl border border-border bg-background px-4 py-3 text-sm font-semibold {{ $product->stock > 0 ? 'text-primary' : 'text-error' }}">
