@@ -65,3 +65,7 @@ Route::get('/carrito', [CartController::class, 'index'])
     ->middleware('auth');
 
 require __DIR__ . '/auth.php';
+
+Route::get('/error', function () {
+    return view('errors.404');
+});
