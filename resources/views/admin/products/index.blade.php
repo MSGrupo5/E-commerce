@@ -49,7 +49,7 @@
                         <tr class="hover:bg-background/50 transition-colors">
                             <td class="px-5 py-4">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ $product->image }}" alt="{{ $product->name }}"
+                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
                                         class="w-10 h-10 rounded-lg object-cover bg-background shrink-0"
                                         onerror="this.style.display='none'">
                                     <span class="font-medium text-text truncate">{{ $product->name }}</span>

@@ -2,7 +2,7 @@
 {{-- Props: $product (App\Models\Product), $isFavorite (bool) --}}
 @props(['product', 'isFavorite' => false])
 @php
-    $image = $product->image ?? '';
+    $image = $product->image_url;
     $categoryName = optional($product->category)->name ?? 'Sin categoría';
     $isOutOfStock = (isset($product->stock) ? intval($product->stock) : 0) <= 0;
     $badge = $product->badge ?? null;

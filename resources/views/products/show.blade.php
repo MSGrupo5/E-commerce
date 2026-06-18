@@ -11,10 +11,10 @@
             <div class="lg:col-span-3 rounded-3xl border border-border bg-surface p-4 sm:p-6">
                 <div class="overflow-hidden rounded-2xl bg-background">
                     <img
-                        src="{{ $product->image }}"
+                        src="{{ $product->image_url }}"
                         alt="{{ $product->name }}"
                         class="h-64 sm:h-80 lg:h-96 w-full object-contain object-center"
-                        onerror="this.src='https://via.placeholder.com/720x420?text=Sin+imagen'"
+                        onerror="this.src='https://placehold.co/720x420?text=Sin+imagen'"
                     />
                 </div>
             </div>

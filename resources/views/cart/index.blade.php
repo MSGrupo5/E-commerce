@@ -30,7 +30,7 @@
                     {{-- Imagen --}}
                     <a href="{{ route('products.show', $item->product) }}" class="shrink-0">
                         <img
-                            src="{{ $item->product->image }}"
+                            src="{{ $item->product->image_url }}"
                             alt="{{ $item->product->name }}"
                             class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover bg-background"
                             onerror="this.style.display='none'"
