@@ -62,18 +62,23 @@
                     <span class="hidden md:inline text-sm font-medium">Favoritos</span>
                 </a>
 
-                <a href="{{ route('cart.index') }}"
-                    class="flex items-center gap-2 text-muted hover:text-text transition-colors relative group">
+                <div class="flex items-center gap-2 text-muted transition-colors relative group">
                     <div class="relative">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="m2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                         </svg>
                         <span
-                            class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-primary text-background text-[9px] font-bold flex items-center justify-center">0</span>
+                            class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-primary text-background text-[9px] font-bold flex items-center justify-center">
+                            @auth
+                                {{ auth()->user()->cart?->items()->sum('quantity') ?? 0 }}
+                            @else
+                                0
+                            @endauth
+                        </span>
                     </div>
                     <span class="hidden md:inline text-sm font-medium">Carrito</span>
-                </a>
+                </div>
 
                 <div class="hidden md:block">
                     @if (auth()->check())

@@ -15,7 +15,9 @@ class CartController extends Controller
             ->where('user_id', request()->user()->id)
             ->first();
 
-        return view('cart.index', compact('cart'));
+        $items = $cart?->items ?? collect();
+
+        return view('cart.index', compact('cart', 'items'));
     }
 
     public function store(Request $request)

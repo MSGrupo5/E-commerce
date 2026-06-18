@@ -37,7 +37,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart', [CartController::class, 'store'])->name('cart.add');
     Route::patch('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
-
 });
 
 Route::prefix('panel')
@@ -60,5 +59,9 @@ Route::middleware('auth')->prefix('profile/catalog')->name('profile.catalog.')->
     Route::patch('/{product}', [UserCatalogController::class, 'update'])->name('update');
     Route::delete('/{product}', [UserCatalogController::class, 'destroy'])->name('destroy');
 });
+
+Route::get('/carrito', [CartController::class, 'index'])
+    ->name('cart.index')
+    ->middleware('auth');
 
 require __DIR__ . '/auth.php';
