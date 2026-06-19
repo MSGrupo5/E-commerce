@@ -51,7 +51,7 @@ class CheckoutController extends Controller
             }
         }
 
-        DB::transaction(function () use ($user, $cart, $validated) {
+        $order = DB::transaction(function () use ($user, $cart, $validated) {
             // Actualizar la dirección de entrega en el perfil del usuario
             if ($user->direccion_entrega !== $validated['direccion_entrega']) {
                 $user->update([
@@ -83,8 +83,23 @@ class CheckoutController extends Controller
 
             // Vaciar el carrito de compras
             $cart->items()->delete();
+
+            return $order;
         });
 
-        return redirect()->route('products.index')->with('success', '¡Compra confirmada con éxito! Tu pedido está pendiente de entrega.');
+        // Store success message in session without redirecting to index.
+        return redirect()->route('checkout.confirmation', $order)->with('success', '¡Compra confirmada con éxito!');
+    }
+
+    public function confirmation(Order $order)
+    {
+        // Ensure user owns this order
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $order->load(['items.product.seller']);
+
+        return view('checkout.confirmation', compact('order'));
     }
 }
