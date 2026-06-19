@@ -7,10 +7,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use App\Models\user;
 
 class ProductController extends Controller
 {
@@ -22,11 +22,20 @@ class ProductController extends Controller
             ->when($request->filled('category_id'), function ($q) use ($request) {
                 $q->where('category_id', $request->category_id);
             })
-            ->when($request->filled('seller'), fn($q, $id) => $q->where('user_id', $id))
+            ->when(
+                $request->filled('seller'),
+                fn ($q, $id) => $q->where('user_id', $id)
+            )
             ->latest()
             ->paginate(20);
 
-        return view('admin.products.index', compact('products', 'categories'));
+        return view('admin.products.index', [
+            'products' => $products,
+            'categories' => $categories,
+            'activeSeller' => $request->filled('seller')
+                ? User::find($request->seller)
+                : null,
+        ]);
     }
 
     public function destroy(Product $product): RedirectResponse
