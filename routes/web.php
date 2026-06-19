@@ -38,6 +38,10 @@ Route::middleware('auth')->prefix('pedido')->name('checkout.')->group(function (
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/', [CheckoutController::class, 'store'])->name('store');
     Route::get('/{order}/confirmacion', [CheckoutController::class, 'confirmacion'])->name('confirmacion');
+
+    Route::get('/mercadopago/callback/{status}', [CheckoutController::class, 'mpCallback'])
+        ->name('mp.callback')
+        ->whereIn('status', ['success', 'failure', 'pending']);
 });
 
 // ─── Perfil ──────────────────────────────────────────────────────────────────

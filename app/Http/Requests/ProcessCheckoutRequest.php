@@ -15,8 +15,8 @@ class ProcessCheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shipping_address'  => ['required', 'string', 'max:500'],
-            'payment_method'    => ['required', Rule::in(['efectivo', 'tarjeta', 'usdt'])],
+            'shipping_address' => ['required', 'string', 'max:500'],
+            'payment_method' => ['required', Rule::in(['efectivo', 'tarjeta', 'usdt', 'mercadopago'])],
         ];
     }
 
@@ -24,7 +24,7 @@ class ProcessCheckoutRequest extends FormRequest
     {
         return [
             'shipping_address' => 'dirección de entrega',
-            'payment_method'   => 'método de pago',
+            'payment_method' => 'método de pago',
         ];
     }
 }

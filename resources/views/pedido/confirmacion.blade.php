@@ -11,9 +11,15 @@
         </div>
 
         <div class="space-y-3">
-            <h1 class="text-h2 font-oxanium font-bold text-text">¡Pedido confirmado!</h1>
+            <h1 class="text-h2 font-oxanium font-bold text-text">
+                {{ $order->isPaid() ? '¡Pago recibido!' : '¡Pedido confirmado!' }}
+            </h1>
             <p class="text-muted text-body leading-relaxed">
-                Tu pedido #{{ $order->id }} fue registrado con éxito. Te contactaremos cuando esté en camino.
+                @if($order->isPaid())
+                    Tu pago para el pedido #{{ $order->id }} fue acreditado correctamente. Prepararemos tu envío a la brevedad.
+                @else
+                    Tu pedido #{{ $order->id }} fue registrado con éxito. Te contactaremos cuando esté en camino.
+                @endif
             </p>
         </div>
 
@@ -21,9 +27,10 @@
         <div class="rounded-3xl border border-border bg-surface p-6 text-left space-y-5">
             <div class="flex items-center justify-between">
                 <h2 class="text-base font-semibold text-text">Detalle del pedido</h2>
-                <span class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full bg-warning/10 border border-warning/20 text-warning">
-                    <span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
-                    Pendiente
+                <span class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full
+                    {{ $order->isPaid() ? 'bg-success/10 border border-success/20 text-success' : 'bg-warning/10 border border-warning/20 text-warning' }}">
+                    <span class="w-1.5 h-1.5 rounded-full {{ $order->isPaid() ? 'bg-success' : 'bg-warning' }}"></span>
+                    {{ $order->isPaid() ? 'Pagado' : 'Pendiente' }}
                 </span>
             </div>
 
@@ -57,7 +64,7 @@
                     <span class="text-muted shrink-0">Método de pago</span>
                     <span class="text-text font-medium">
                         @php
-                            $labels = ['efectivo' => 'Efectivo', 'tarjeta' => 'Tarjeta (débito / crédito)', 'usdt' => 'USDT / Crypto'];
+                            $labels = ['efectivo' => 'Efectivo', 'tarjeta' => 'Tarjeta (débito / crédito)', 'usdt' => 'USDT / Crypto', 'mercadopago' => 'Mercado Pago'];
                         @endphp
                         {{ $labels[$order->payment_method] ?? $order->payment_method }}
                     </span>
@@ -69,6 +76,20 @@
                         </svg>
                         <p class="text-xs text-warning/90 leading-relaxed">
                             En breve nos contactaremos para enviarte la dirección de wallet para completar tu pago en USDT.
+                        </p>
+                    </div>
+                @endif
+                @if($order->payment_method === 'mercadopago')
+                    <div class="flex items-start gap-3 rounded-xl border border-accent/25 bg-accent/5 px-4 py-3">
+                        <svg class="w-4 h-4 text-accent shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+                        </svg>
+                        <p class="text-xs text-accent/90 leading-relaxed">
+                            @if($order->isPaid())
+                                El pago fue acreditado correctamente a través de Mercado Pago.
+                            @else
+                                Estamos esperando la confirmación del pago de Mercado Pago. Te notificaremos cuando se acredite.
+                            @endif
                         </p>
                     </div>
                 @endif

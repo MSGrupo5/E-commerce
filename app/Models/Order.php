@@ -17,6 +17,7 @@ class Order extends Model
         'status',
         'shipping_address',
         'payment_method',
+        'mp_preference_id',
     ];
 
     protected function casts(): array

@@ -67,7 +67,7 @@
                         <p class="text-error text-xs mb-3">{{ $message }}</p>
                     @enderror
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
 
                         {{-- Efectivo --}}
                         <label
@@ -147,6 +147,32 @@
                             </div>
                         </label>
 
+                        {{-- Mercado Pago --}}
+                        <label
+                            :class="metodo === 'mercadopago'
+                                ? 'border-primary bg-primary/5 shadow-[0_0_0_1px] shadow-primary/30'
+                                : 'border-border hover:border-primary/40 bg-background'"
+                            class="relative flex flex-col items-center gap-3 p-5 rounded-2xl border cursor-pointer transition-all">
+                            <input type="radio" name="payment_method" value="mercadopago" form="checkout-form"
+                                x-model="metodo" class="sr-only">
+                            <div :class="metodo === 'mercadopago' ? 'text-primary' : 'text-muted'" class="transition-colors">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93Zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39Z"/>
+                                </svg>
+                            </div>
+                            <div class="text-center">
+                                <p :class="metodo === 'mercadopago' ? 'text-primary' : 'text-text'"
+                                    class="text-sm font-semibold transition-colors">Mercado Pago</p>
+                                <p class="text-xs text-muted mt-0.5">Tarjeta · Transferencia</p>
+                            </div>
+                            <div x-show="metodo === 'mercadopago'" x-cloak
+                                class="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                                <svg class="w-3 h-3 text-background" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+                                </svg>
+                            </div>
+                        </label>
+
                     </div>
 
                     {{-- Aviso contextual USDT --}}
@@ -168,6 +194,17 @@
                         </svg>
                         <p class="text-xs text-muted leading-relaxed">
                             Podrás pagar con tu tarjeta al momento de recibir el pedido o al retirar en el local.
+                        </p>
+                    </div>
+
+                    {{-- Aviso contextual Mercado Pago --}}
+                    <div x-show="metodo === 'mercadopago'" x-cloak x-transition
+                        class="mt-4 flex items-start gap-3 rounded-2xl border border-accent/25 bg-accent/5 px-4 py-3.5">
+                        <svg class="w-4 h-4 text-accent shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+                        </svg>
+                        <p class="text-xs text-muted leading-relaxed">
+                            Serás redirigido a Mercado Pago para pagar con tarjeta, transferencia o efectivo (Rapipago / Pago Fácil).
                         </p>
                     </div>
 

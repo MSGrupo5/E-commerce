@@ -8,7 +8,9 @@ use App\Http\Requests\ProcessCheckoutRequest;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\MercadoPagoService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
@@ -46,15 +48,17 @@ class CheckoutController extends Controller
 
         $total = $cart->items->sum(fn ($item) => $item->product->price * $item->quantity);
 
+        $items = $cart->items;
+
         $order = Order::create([
-            'user_id'         => auth()->id(),
-            'total'           => $total,
-            'status'          => 'pending',
+            'user_id' => auth()->id(),
+            'total' => $total,
+            'status' => 'pending',
             'shipping_address' => $request->shipping_address,
-            'payment_method'  => $request->payment_method,
+            'payment_method' => $request->payment_method,
         ]);
 
-        foreach ($cart->items as $item) {
+        foreach ($items as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $item->product_id,
@@ -66,6 +70,21 @@ class CheckoutController extends Controller
         }
 
         $cart->items()->delete();
+
+        if ($request->payment_method === 'mercadopago') {
+            $mp = app(MercadoPagoService::class);
+
+            if ($mp->isAvailable()) {
+                $checkoutUrl = $mp->createPreference($order, $items);
+
+                if ($checkoutUrl) {
+                    return redirect()->away($checkoutUrl);
+                }
+            }
+
+            return redirect()->route('checkout.confirmacion', $order)
+                ->with('info', 'Mercado Pago no está disponible. Tu pedido quedó registrado como pendiente.');
+        }
 
         return redirect()->route('checkout.confirmacion', $order)
             ->with('success', '¡Pedido realizado con éxito!');
@@ -80,5 +99,20 @@ class CheckoutController extends Controller
         $order->load('items.product');
 
         return view('pedido.confirmacion', compact('order'));
+    }
+
+    public function mpCallback(Request $request, string $status): RedirectResponse
+    {
+        $mp = app(MercadoPagoService::class);
+        $mp->handleCallback($request, $status);
+
+        $externalRef = $request->query('external_reference');
+        $order = Order::find((int) $externalRef);
+
+        if ($order && $order->user_id === auth()->id()) {
+            return redirect()->route('checkout.confirmacion', $order);
+        }
+
+        return redirect()->route('home');
     }
 }
