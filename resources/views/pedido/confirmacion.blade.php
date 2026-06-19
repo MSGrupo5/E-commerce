@@ -87,9 +87,9 @@
                 class="inline-flex items-center justify-center gap-2 bg-primary text-background font-semibold text-sm px-6 py-3.5 rounded-2xl hover:bg-primary/90 transition-colors">
                 Seguir comprando
             </a>
-            <a href="{{ route('seller.dashboard') }}"
+            <a href="{{ route('seller.compras') }}"
                 class="inline-flex items-center justify-center gap-2 border border-border bg-surface text-text font-medium text-sm px-6 py-3.5 rounded-2xl hover:bg-background transition-colors">
-                Ver mi panel
+                Ver historial de compra
             </a>
         </div>
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -80,6 +81,15 @@ Route::prefix('admin')
 
         Route::patch('usuarios/{user}/toggle', [UserController::class, 'toggleStatus'])
             ->name('users.toggle');
+
+        Route::get('categorias', [CategoryController::class, 'index'])
+            ->name('categorias.index');
+        Route::post('categorias', [CategoryController::class, 'store'])
+            ->name('categorias.store');
+        Route::patch('categorias/{category}', [CategoryController::class, 'update'])
+            ->name('categorias.update');
+        Route::delete('categorias/{category}', [CategoryController::class, 'destroy'])
+            ->name('categorias.destroy');
     });
 
 require __DIR__.'/auth.php';
