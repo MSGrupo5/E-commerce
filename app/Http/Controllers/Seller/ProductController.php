@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $products = Product::with('category')
             ->where('user_id', auth()->id())
@@ -20,23 +23,16 @@ class ProductController extends Controller
         return view('seller.products.index', compact('products'));
     }
 
-    public function create()
+    public function create(): View
     {
         $categories = Category::all();
 
         return view('seller.products.form', compact('categories'));
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'stock'       => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
@@ -47,17 +43,17 @@ class ProductController extends Controller
         Product::create($data);
 
         return redirect()->route('seller.productos.index')
-            ->with('success', 'Producto creado correctamente.');
+            ->with('success', '¡Producto subido con éxito! Ya está visible en el catálogo.');
     }
 
-    public function show(Product $product)
+    public function show(Product $product): RedirectResponse
     {
         $this->authorize('update', $product);
 
         return redirect()->route('seller.productos.edit', $product);
     }
 
-    public function edit(Product $product)
+    public function edit(Product $product): View
     {
         $this->authorize('update', $product);
 
@@ -66,18 +62,9 @@ class ProductController extends Controller
         return view('seller.products.form', compact('product', 'categories'));
     }
 
-    public function update(Request $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
-        $this->authorize('update', $product);
-
-        $data = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'stock'       => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
             if ($product->image) {
@@ -89,10 +76,10 @@ class ProductController extends Controller
         $product->update($data);
 
         return redirect()->route('seller.productos.index')
-            ->with('success', 'Producto actualizado correctamente.');
+            ->with('success', '¡Cambios guardados con éxito!');
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product): RedirectResponse
     {
         $this->authorize('delete', $product);
 
@@ -108,5 +95,16 @@ class ProductController extends Controller
 
         return redirect()->route('seller.productos.index')
             ->with('success', 'Producto eliminado correctamente.');
+    }
+
+    public function toggleActivo(Product $product): RedirectResponse
+    {
+        $this->authorize('toggleActivo', $product);
+
+        $product->update(['is_active' => ! $product->is_active]);
+
+        $mensaje = $product->is_active ? 'Producto activado.' : 'Producto desactivado.';
+
+        return back()->with('success', $mensaje);
     }
 }

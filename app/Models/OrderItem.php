@@ -21,7 +21,7 @@ class OrderItem extends Model
     {
         return [
             'quantity' => 'integer',
-            'price'    => 'decimal:2',
+            'price' => 'decimal:2',
             // 'price' guarda el precio al momento de la compra,
             // independiente de si el producto cambia de precio después.
         ];

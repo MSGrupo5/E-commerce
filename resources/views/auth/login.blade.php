@@ -2,22 +2,16 @@
     <div class="w-full mx-auto" style="max-width: 440px;">
 
         <div class="flex flex-col items-center mb-8">
-            <div class="flex items-center gap-2 mb-6">
-                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentcolor" stroke-width="2" viewbox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m13 2l-10 12h9l-2 8 10-12h-9l2-8z" />
-                </svg>
-                <span class="text-text font-bold text-h4 uppercase font-oxanium"
-                    style="letter-spacing: 2px;">nexustech</span>
-            </div>
-            <h1 class="text-h3 font-bold text-text text-center mb-1.5 font-oxanium">Bienvenido de vuelta
-            </h1>
-            <p class="text-muted text-h6 text-center font-jakarta">Iniciá sesión para continuar
-            </p>
+            <a href="{{ route('home') }}" class="mb-6">
+                <x-app.logo />
+            </a>
+            <h1 class="text-h3 font-bold text-text text-center mb-1.5 font-oxanium">Bienvenido de vuelta</h1>
+            <p class="text-muted text-h6 text-center font-jakarta">Iniciá sesión para continuar</p>
         </div>
 
         <div class="flex rounded-xl p-1 mb-8 bg-surface border border-border">
             <a href="{{ route('login') }}"
-                class="flex-1 py-2.5 rounded-lg text-small font-semibold text-center transition-all bg-primary text-text font-jakarta">Iniciar
+                class="flex-1 py-2.5 rounded-lg text-small font-semibold text-center transition-all bg-primary text-background font-jakarta">Iniciar
                 Sesión</a>
             <a href="{{ route('register') }}"
                 class="flex-1 py-2.5 rounded-lg text-small font-semibold text-center transition-all bg-transparent text-muted hover:text-text font-jakarta">Registrarse</a>

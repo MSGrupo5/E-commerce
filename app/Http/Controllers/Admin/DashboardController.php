@@ -6,15 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $totalProductos = Product::count();
-        $totalPedidos   = Order::count();
-        $totalUsuarios  = User::where('role', 'usuario')->count();
+        $totalPedidos = Order::count();
+        $totalUsuarios = User::where('role', 'usuario')->count();
 
         return view('admin.dashboard', compact(
             'totalProductos',

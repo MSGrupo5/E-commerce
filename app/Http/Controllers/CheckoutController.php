@@ -4,102 +4,81 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProcessCheckoutRequest;
 use App\Models\Cart;
 use App\Models\Order;
-use App\Models\Product;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\OrderItem;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class CheckoutController extends Controller
 {
-    public function show()
+    public function index(): View|RedirectResponse
     {
-        $cart = Cart::with('items.product.seller')
-            ->where('user_id', auth()->id())
-            ->first();
+        $cart = Cart::with('items.product')->where('user_id', auth()->id())->first();
 
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Tu carrito está vacío.');
+        if (! $cart || $cart->items->isEmpty()) {
+            return redirect()->route('cart.index')->with('info', 'Tu carrito está vacío.');
         }
 
         $items = $cart->items;
+        $total = $items->sum(fn ($item) => $item->product->price * $item->quantity);
+        $user = auth()->user();
 
-        return view('checkout.show', compact('items'));
+        return view('pedido.index', compact('items', 'total', 'user'));
     }
 
-    public function process(Request $request)
+    public function store(ProcessCheckoutRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'direccion_entrega' => 'required|string|max:255',
-        ]);
+        $cart = Cart::with('items.product')->where('user_id', auth()->id())->first();
 
-        $user = auth()->user();
-        $cart = Cart::with('items.product.seller')
-            ->where('user_id', $user->id)
-            ->first();
-
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Tu carrito está vacío.');
+        if (! $cart || $cart->items->isEmpty()) {
+            return redirect()->route('cart.index')->with('info', 'Tu carrito está vacío.');
         }
 
-        // Validar stock de todos los productos antes de iniciar la transacción
         foreach ($cart->items as $item) {
             if ($item->quantity > $item->product->stock) {
                 return back()->withErrors([
-                    'direccion_entrega' => "El producto '{$item->product->name}' no tiene suficiente stock disponible (disponible: {$item->product->stock}).",
+                    'stock' => "Stock insuficiente para \"{$item->product->name}\".",
                 ]);
             }
         }
 
-        $order = DB::transaction(function () use ($user, $cart, $validated) {
-            // Actualizar la dirección de entrega en el perfil del usuario
-            if ($user->direccion_entrega !== $validated['direccion_entrega']) {
-                $user->update([
-                    'direccion_entrega' => $validated['direccion_entrega'],
-                ]);
-            }
+        $total = $cart->items->sum(fn ($item) => $item->product->price * $item->quantity);
 
-            $total = $cart->items->sum(fn($item) => $item->quantity * $item->product->price);
+        $order = Order::create([
+            'user_id'         => auth()->id(),
+            'total'           => $total,
+            'status'          => 'pending',
+            'shipping_address' => $request->shipping_address,
+            'payment_method'  => $request->payment_method,
+        ]);
 
-            // Crear la Orden
-            $order = Order::create([
-                'user_id' => $user->id,
-                'total' => $total,
-                'status' => 'pending',
-                'shipping_address' => $validated['direccion_entrega'],
+        foreach ($cart->items as $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+                'price' => $item->product->price,
             ]);
 
-            // Registrar cada ítem en la orden y descontar stock
-            foreach ($cart->items as $item) {
-                $order->items()->create([
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->product->price,
-                ]);
+            $item->product->decrement('stock', $item->quantity);
+        }
 
-                // Descontar del stock físico
-                $item->product->decrement('stock', $item->quantity);
-            }
+        $cart->items()->delete();
 
-            // Vaciar el carrito de compras
-            $cart->items()->delete();
-
-            return $order;
-        });
-
-        // Store success message in session without redirecting to index.
-        return redirect()->route('checkout.confirmation', $order)->with('success', '¡Compra confirmada con éxito!');
+        return redirect()->route('checkout.confirmacion', $order)
+            ->with('success', '¡Pedido realizado con éxito!');
     }
 
-    public function confirmation(Order $order)
+    public function confirmacion(Order $order): View|RedirectResponse
     {
-        // Ensure user owns this order
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }
 
-        $order->load(['items.product.seller']);
+        $order->load('items.product');
 
-        return view('checkout.confirmation', compact('order'));
+        return view('pedido.confirmacion', compact('order'));
     }
 }

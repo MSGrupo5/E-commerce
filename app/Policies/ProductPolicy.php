@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
 use App\Models\Product;
 use App\Models\User;
 
@@ -35,6 +34,11 @@ class ProductPolicy
     }
 
     public function delete(User $user, Product $product): bool
+    {
+        return $user->id === $product->user_id || $user->isAdmin();
+    }
+
+    public function toggleActivo(User $user, Product $product): bool
     {
         return $user->id === $product->user_id || $user->isAdmin();
     }
