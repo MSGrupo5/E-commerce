@@ -27,12 +27,21 @@
                     @error('name') <p class="text-error text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div>
+                <div x-data="{ chars: {{ mb_strlen(old('description', $product->description ?? '')) }} }">
                     <label for="description" class="block text-small font-medium text-text mb-1.5">Descripción</label>
-                    <textarea id="description" name="description" rows="4"
+                    <textarea id="description" name="description" rows="4" maxlength="1000"
+                        @input="chars = $event.target.value.length"
                         class="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted"
                         placeholder="Describí el producto...">{{ old('description', $product->description ?? '') }}</textarea>
-                    @error('description') <p class="text-error text-xs mt-1">{{ $message }}</p> @enderror
+                    <div class="flex items-start justify-between gap-2 mt-1">
+                        <div>
+                            @error('description') <p class="text-error text-xs">{{ $message }}</p> @enderror
+                        </div>
+                        <span class="text-xs shrink-0 tabular-nums transition-colors"
+                            :class="chars >= 1000 ? 'text-error font-semibold' : chars >= 900 ? 'text-warning' : 'text-muted'"
+                            x-text="chars + ' / 1000'">
+                        </span>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -70,14 +79,20 @@
                                 placeholder="0.00">
                         </div>
                         <input type="hidden" name="price" :value="raw">
-                        <p class="text-xs text-muted/70 mt-1.5 min-h-[1rem]" x-show="raw > 0" x-cloak>
-                            ≈ USD
-                            <span class="font-medium text-muted"
-                                x-text="Math.round(parseFloat(raw) / {{ $usdToArs ?? 1200 }}).toLocaleString('en-US')">
-                            </span>
-                            <span class="text-muted/50">(blue)</span>
-                        </p>
-                        @error('price') <p class="text-error text-xs mt-1">{{ $message }}</p> @enderror
+                        <div class="flex items-start justify-between gap-2 mt-1.5 min-h-[1rem]">
+                            <p class="text-xs text-muted/70" x-show="raw > 0 && raw <= 99999999" x-cloak>
+                                ≈ USD
+                                <span class="font-medium text-muted"
+                                    x-text="Math.round(parseFloat(raw) / {{ $usdToArs ?? 1200 }}).toLocaleString('en-US')">
+                                </span>
+                                <span class="text-muted/50">(blue)</span>
+                            </p>
+                            <p class="text-xs text-error" x-show="raw > 99999999" x-cloak>
+                                Máximo permitido: $99.999.999
+                            </p>
+                            <span class="text-[10px] text-muted/50 shrink-0 ml-auto">mín. $1 · máx. $99.999.999</span>
+                        </div>
+                        @error('price') <p class="text-error text-xs mt-0.5">{{ $message }}</p> @enderror
                     </div>
 
                     {{-- Stock con controles +/- --}}

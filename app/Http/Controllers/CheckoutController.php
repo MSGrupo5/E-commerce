@@ -11,6 +11,7 @@ use App\Models\OrderItem;
 use App\Services\MercadoPagoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
@@ -50,26 +51,30 @@ class CheckoutController extends Controller
 
         $items = $cart->items;
 
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'total' => $total,
-            'status' => 'pending',
-            'shipping_address' => $request->shipping_address,
-            'payment_method' => $request->payment_method,
-        ]);
-
-        foreach ($items as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'price' => $item->product->price,
+        $order = DB::transaction(function () use ($cart, $request, $total) {
+            $order = Order::create([
+                'user_id'          => auth()->id(),
+                'total'            => $total,
+                'status'           => 'pending',
+                'shipping_address' => $request->shipping_address,
+                'payment_method'   => $request->payment_method,
             ]);
 
-            $item->product->decrement('stock', $item->quantity);
-        }
+            foreach ($cart->items as $item) {
+                OrderItem::create([
+                    'order_id'   => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity'   => $item->quantity,
+                    'price'      => $item->product->price,
+                ]);
 
-        $cart->items()->delete();
+                $item->product->decrement('stock', $item->quantity);
+            }
+
+            $cart->items()->delete();
+
+            return $order;
+        });
 
         if ($request->payment_method === 'mercadopago') {
             $mp = app(MercadoPagoService::class);
