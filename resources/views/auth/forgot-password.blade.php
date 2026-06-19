@@ -2,13 +2,9 @@
     <div class="w-full mx-auto" style="max-width: 440px;">
         
         <div class="flex flex-col items-center mb-8">
-            <div class="flex items-center gap-2 mb-6">
-                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentcolor" stroke-width="2" viewbox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m13 2l-10 12h9l-2 8 10-12h-9l2-8z" />
-                </svg>
-                <span class="text-text font-bold text-h4 uppercase font-oxanium" style="letter-spacing: 2px;">nexustech</span>
-            </div>
-            
+            <a href="{{ route('home') }}" class="mb-6">
+                <x-app.logo />
+            </a>
             <h1 class="text-h3 font-bold text-text text-center mb-1.5 font-oxanium">Recuperar contraseña</h1>
             <p class="text-muted text-h6 text-center font-jakarta">Te ayudamos a recuperar el acceso</p>
         </div>
@@ -31,7 +27,7 @@
                     <x-input-error :messages="$errors->get('email')" class="mt-2 text-error text-label" />
                 </div>
 
-                <button type="submit" class="w-full py-4 mt-2 rounded-xl bg-primary text-text text-body font-bold hover:opacity-90 transition-all cursor-pointer border-none font-jakarta flex items-center justify-center gap-2">
+                <button type="submit" class="w-full py-4 mt-2 rounded-xl bg-primary text-background text-body font-bold hover:opacity-90 transition-all cursor-pointer border-none font-jakarta flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentcolor" stroke-width="2" viewbox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" />
                     </svg>

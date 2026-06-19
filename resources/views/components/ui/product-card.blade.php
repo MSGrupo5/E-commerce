@@ -2,11 +2,14 @@
 {{-- Props: $product (App\Models\Product), $isFavorite (bool) --}}
 @props(['product', 'isFavorite' => false])
 @php
-    $image = $product->image ?? '';
+    $image = $product->image_url ?? '';
     $categoryName = optional($product->category)->name ?? 'Sin categoría';
     $isOutOfStock = (isset($product->stock) ? intval($product->stock) : 0) <= 0;
     $badge = $product->badge ?? null;
     $originalPrice = $product->original_price ?? null;
+    $priceUsd = isset($usdToArs) && $usdToArs > 0
+        ? number_format($product->price / $usdToArs, 0, ',', '.')
+        : null;
 @endphp
 
 <div class="w-full max-w-full sm:max-w-[260px] rounded-[32px] border border-border bg-surface shadow-[0_24px_64px_rgba(0,0,0,0.25)] overflow-hidden transition-all duration-300 hover:border-primary/40 hover:-translate-y-0.5">
@@ -26,22 +29,27 @@
             @php
                 $favBtnClasses = $isFavorite ? 'bg-error/15 border border-error/30 text-error' : 'bg-surface/90 border border-border text-muted';
             @endphp
-            @if(Route::has('favorites.toggle'))
+            @auth
                 <form action="{{ route('favorites.toggle', $product) }}" method="POST">
                     @csrf
-                    <button type="submit" class="inline-flex h-10 w-10 items-center justify-center rounded-2xl transition hover:bg-primary/10 {{ $favBtnClasses }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="{{ $isFavorite ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button type="submit" title="{{ $isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos' }}"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-2xl transition hover:bg-error/10 hover:border-error/30 hover:text-error {{ $favBtnClasses }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                            fill="{{ $isFavorite ? 'currentColor' : 'none' }}"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                         </svg>
                     </button>
                 </form>
             @else
-                <button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-surface/90 border border-border text-muted cursor-not-allowed">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <a href="{{ route('login') }}" title="Iniciar sesión para guardar favoritos"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-surface/90 border border-border text-muted hover:border-error/30 hover:text-error hover:bg-error/10 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                     </svg>
-                </button>
-            @endif
+                </a>
+            @endauth
         </div>
     </div>
 
@@ -59,13 +67,16 @@
         </div>
 
         <div class="flex items-center justify-between gap-3">
-            <div class="space-y-1">
+            <div class="space-y-0.5">
                 <div class="flex items-end gap-2">
                     <span class="text-xl font-bold text-primary">${{ number_format($product->price, 0, ',', '.') }}</span>
                     @if($originalPrice)
                         <span class="text-sm text-muted line-through">${{ number_format($originalPrice, 0, ',', '.') }}</span>
                     @endif
                 </div>
+                @if($priceUsd)
+                    <p class="text-[11px] text-muted/70">≈ USD {{ $priceUsd }}</p>
+                @endif
                 <p class="text-xs text-muted">
                     {{ $isOutOfStock ? 'Agotado' : 'En stock' }}
                 </p>

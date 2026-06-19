@@ -40,9 +40,9 @@
         </div>
     @endif
 
-    <div class="rounded-3xl border border-border bg-surface overflow-hidden max-h-[600px]">
-        <div class="overflow-x-auto overflow-y-auto">
-            <table class="w-full text-left text-small">
+    <div class="rounded-3xl border border-border bg-surface overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-small min-w-[640px]">
                 <thead class="sticky top-0 z-10 bg-surface">
                     <tr class="border-b border-border text-muted text-[11px] uppercase tracking-[0.15em]">
                         <th class="px-5 py-4 font-semibold">Nombre</th>

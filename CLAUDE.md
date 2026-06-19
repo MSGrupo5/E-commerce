@@ -4,30 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**NexusTech** — an academic e-commerce project built with Laravel 12 (PHP 8.2+), Tailwind CSS 3, and Alpine.js (via Blade). The app is a multi-role marketplace where any authenticated user can sell products (seller role), and a separate admin role manages the platform.
+**Marketo** — un marketplace académico construido con Laravel 12 (PHP 8.2+), Tailwind CSS 3 y Alpine.js (vía Blade). Cualquier usuario registrado puede vender productos en su panel de vendedor; un rol separado de admin gestiona la plataforma. Los visitantes no autenticados pueden navegar y agregar al carrito (sesión PHP), pero el checkout requiere login.
 
 ## Commands
 
 ```bash
-# Full dev stack (server + queue + Vite hot-reload, concurrently)
+# Setup inicial tras clonar (install deps, .env, key:generate, migrate, npm install + build)
+composer run setup
+
+# Stack completo de dev (servidor + queue + Vite hot-reload, concurrentemente)
 composer run dev
 
-# Run tests
+# Correr todos los tests
 composer run test
-# or a single test file
+# O un test individual
 php artisan test --filter=ExampleTest
 
-# Code formatting (Laravel Pint)
+# Formateo de código (Laravel Pint)
 ./vendor/bin/pint
 
-# Migrations & seeding
+# Migraciones y seeding
 php artisan migrate
-php artisan db:seed          # creates admin@nexustech.com (role=admin) + test@example.com
+php artisan db:seed          # crea admin@nexustech.com (role=admin) + test@example.com
 
-# Rebuild assets
+# Compilar assets
 npm run build
 
-# Create storage symlink (required once after clone)
+# Symlink de storage (requerido una vez después de clonar)
 php artisan storage:link
 ```
 
@@ -35,30 +38,43 @@ php artisan storage:link
 
 ### Roles & Access Control
 
-Three roles on `users.role`: `admin`, `usuario` (default for new registrations), and any authenticated user can act as a seller via the `/panel` routes.
+Tres roles en `users.role`: `admin`, `usuario` (default al registrarse). Todos los `usuario` tienen acceso al panel de vendedor `/panel` automáticamente. `User::isAdmin()` y `User::isUsuario()` disponibles como helpers.
 
-- `admin` middleware alias → `EnsureUserIsAdmin` (`app/Http/Middleware/EnsureUserIsAdmin.php`)
-- `ProductPolicy` (`app/Policies/ProductPolicy.php`) gates seller product edits: only the owner (`user_id`) or an admin can update/delete a product
-- The policy is registered manually in `AppServiceProvider::boot()` via `Gate::policy()`
+- Middleware `admin` → `EnsureUserIsAdmin` (`app/Http/Middleware/EnsureUserIsAdmin.php`)
+- `ProductPolicy` (`app/Policies/ProductPolicy.php`) — controla create, update, delete, toggleActivo. Solo el dueño (`user_id`) o admin puede modificar/eliminar. Registrada manualmente en `AppServiceProvider::boot()`.
+- `MergeGuestCart` listener (`app/Listeners/MergeGuestCart.php`) — escucha `Illuminate\Auth\Events\Login` y fusiona el carrito de sesión al carrito de DB del usuario.
 
 ### Route Groups
 
-| Prefix | Middleware | Name prefix | Purpose |
+| Prefix | Middleware | Name prefix | Propósito |
 |---|---|---|---|
-| `/` | — | `home`, `products.*` | Public catalog |
-| `/admin` | `auth`, `admin` | `admin.` | Admin panel |
-| `/panel` | `auth` | `seller.` | Seller panel |
-| `/profile` | `auth` | `profile.*` | User profile |
-| `/cart` | `auth` | `cart.*` | Shopping cart |
+| `/` | — | `home`, `products.*` | Catálogo público |
+| `/carrito` | — (GET/POST público) | `cart.*` | Carrito (guest y auth) |
+| `/pedido` | `auth` | `checkout.*` | Checkout |
+| `/admin` | `auth`, `admin` | `admin.` | Panel admin |
+| `/panel` | `auth` | `seller.` | Panel vendedor |
+| `/profile` | `auth` | `profile.*` | Perfil de usuario |
+
+> **Nota:** `/carrito` GET y POST son públicos (guests pueden agregar al carrito). `/carrito/{cartItem}` PATCH y DELETE requieren auth.
 
 ### Controllers
 
-Namespaced into three groups mirroring the route groups:
-- `App\Http\Controllers\` — public-facing (ProductController, CartController, UserCatalogController)
-- `App\Http\Controllers\Admin\` — DashboardController, ProductController, UserController
-- `App\Http\Controllers\Seller\` — DashboardController, ProductController, OrderController
+Tres namespaces:
+- `App\Http\Controllers\` — público: `ProductController`, `CartController`, `CheckoutController`
+- `App\Http\Controllers\Admin\` — `DashboardController`, `ProductController` (index + destroy únicamente), `UserController`
+- `App\Http\Controllers\Seller\` — `DashboardController`, `ProductController` (resource completo + `toggleActivo()`), `OrderController`
 
-Both `Admin\ProductController` and `Seller\ProductController` exist — be careful to import the correct one.
+`Seller\ProductController` usa `StoreProductRequest` y `UpdateProductRequest` en lugar de validación inline.
+
+### FormRequests (`app/Http/Requests/`)
+
+| Request | Usado por |
+|---|---|
+| `StoreProductRequest` | `Seller\ProductController::store()` — authorize vía ProductPolicy |
+| `UpdateProductRequest` | `Seller\ProductController::update()` — authorize vía ProductPolicy |
+| `AddToCartRequest` | `CartController::store()` — authorize: true (guests y auth) |
+| `UpdateCartRequest` | `CartController::update()` — authorize: auth check |
+| `ProcessCheckoutRequest` | `CheckoutController::store()` |
 
 ### Models & Relationships
 
@@ -66,36 +82,66 @@ Both `Admin\ProductController` and `Seller\ProductController` exist — be caref
 User ──hasOne──> Cart ──hasMany──> CartItem ──belongsTo──> Product
      ──hasMany──> Order ──hasMany──> OrderItem ──belongsTo──> Product
      ──hasMany──> Favorite ──belongsTo──> Product
-     ──hasMany──> Product   (seller relationship — foreign key user_id)
+     ──hasMany──> Product   (como vendedor, FK user_id)
 
-Product ──belongsTo──> Category
-        ──belongsTo──> User (aliased as seller())
+Product ──belongsTo──> Category (tiene slug para filtrado de catálogo)
+        ──belongsTo──> User (alias seller())
 ```
 
-`Product::seller()` and `Product::user()` both point to `User` via `user_id` — `seller()` is the named alias used in views/queries for clarity.
+Detalles clave de modelos:
+- `Product::seller()` y `Product::user()` apuntan al mismo `User` vía `user_id` — preferir `seller()` en vistas.
+- `Product::scopeSearch()` — busca en `name`, `description` y nombre del seller.
+- `Product::is_active` — productos inactivos retornan 404 en `ProductController::show()`. Los vendedores pueden togglear con `Seller\ProductController::toggleActivo()`.
+- `Product::inStock()` — helper `stock > 0`.
+- `Cart::getOrCreate(User $user)` — factory estático; usar siempre en lugar de `Cart::firstOrCreate()` directamente.
+- `User::apellido`, `User::direccion_entrega` — campos adicionales (no estándar de Breeze).
 
-`Product::scopeSearch()` searches `name`, `description`, and the related seller's `name` field.
+### Guest Cart (Carrito de invitados)
+
+Estructura de sesión: `session('cart.items') = [['product_id' => int, 'quantity' => int], ...]`
+
+- `CartController::index()` — si guest, lee sesión y hydrata con modelos Product. Si auth, lee DB cart.
+- `CartController::store()` — si guest, guarda/incrementa en sesión con validación de stock. Si auth, usa DB cart.
+- Al hacer login, `MergeGuestCart` fusiona la sesión al DB cart automáticamente y borra `session('cart')`.
+
+### Checkout Flow
+
+1. `/carrito` → usuario ve items y CTA "Finalizar compra" (auth) o "Iniciar sesión para comprar" (guest)
+2. `/pedido` — `CheckoutController::index()` muestra form con dirección de entrega
+3. POST `/pedido` — crea `Order` + `OrderItem`s, decrementa stock, vacía carrito
+4. Redirige a `/pedido/{order}/confirmacion`
 
 ### Frontend Stack
 
-- **Tailwind CSS** with a custom dark-mode design system. All color tokens (`background`, `surface`, `border`, `primary`, `accent`, `text`, `muted`, `success`, `error`, `warning`) are defined in `tailwind.config.js` — use these tokens, not raw hex values.
-- **Fonts**: `font-oxanium` (brand/headings) and `font-jakarta` (body) — both defined as Tailwind font families.
-- **Alpine.js** is used inline in Blade for interactive UI (toast notifications, dropdowns).
-- **Vite** compiles assets; `@vite(['resources/css/app.css', 'resources/js/app.js'])` in layouts.
+- **Tailwind CSS** con sistema de diseño oscuro personalizado. Todos los tokens de color (`background`, `surface`, `border`, `primary`, `accent`, `text`, `muted`, `success`, `error`, `warning`) están en `tailwind.config.js` — usar estos tokens, no valores hex directos.
+- **Fuentes**: `font-oxanium` (brand/headings) y `font-jakarta` (body) — definidas como font families de Tailwind.
+- **Alpine.js** — usado inline en Blade para UI interactiva (toasts, dropdowns, preview de imágenes).
+- **Vite** compila assets; `@vite(['resources/css/app.css', 'resources/js/app.js'])` en layouts.
 
 ### Layouts
 
-- `layouts/app.blade.php` — main storefront layout with full nav + footer
-- `layouts/admin.blade.php` — admin panel layout
-- `seller/layout.blade.php` — seller panel layout
-- `layouts/guest.blade.php` — unauthenticated pages (auth flows)
+- `layouts/app.blade.php` — layout principal del storefront con nav (logo Marketo, carrito con contador, user dropdown) + footer
+- `layouts/admin.blade.php` — layout del panel de administración (sidebar + header)
+- `seller/layout.blade.php` — layout del panel de vendedor (sidebar + main content) — **no está bajo `layouts/`**
+- `layouts/guest.blade.php` — páginas no autenticadas (auth flows)
 
-Product images are stored via `Storage::disk('public')` under `products/` and served through the `storage` symlink.
+### Blade Components
+
+| Componente | Archivo | Props |
+|---|---|---|
+| `<x-app.logo>` | `components/app/logo.blade.php` | `$compact=false` |
+| `<x-ui.alert>` | `components/ui/alert.blade.php` | `$type`, `$message`, `$autoDismiss=true` |
+| `<x-ui.stat-card>` | `components/ui/stat-card.blade.php` | `$label`, `$value`, `$icon` (SVG path), `$color='primary'` |
+| `<x-ui.empty-state>` | `components/ui/empty-state.blade.php` | `$icon`, `$title`, `$description`, `$slot` |
+| `<x-ui.product-card>` | `components/ui/product-card.blade.php` | `$product`, `$isFavorite=false` |
+| `<x-ui.category-filter>` | `components/ui/category-filter.blade.php` | `$categories`, `$categorySlug`, `$frontOnly` |
+
+Las imágenes de productos se almacenan en `Storage::disk('public')` bajo `products/` y se sirven vía symlink `storage`.
 
 ## Git & Commit Conventions
 
-Branch pattern: `MSGRUP-{ticket}-{short-description}` branching from `develop`. PRs require 1 approval before merging to `develop`. Never push directly to `main`.
+Branch pattern: `MSGRUP-{ticket}-{short-description}` desde `develop`. PRs requieren 1 aprobación antes de mergear a `develop`. Nunca pushear directo a `main`.
 
 Commit format: `{US-ID}/{type}: {message}`
 - Types: `feat`, `fix`, `style`, `refactor`, `db`, `chore`, `docs`
-- Example: `MSGRUP-95/feat: agregar página 404 personalizada`
+- Ejemplo: `MSGRUP-95/feat: agregar página 404 personalizada`

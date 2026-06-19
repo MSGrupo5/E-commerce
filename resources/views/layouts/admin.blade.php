@@ -1,56 +1,49 @@
 <!doctype html>
-<html lang="es" class="h-full bg-dark-bg">
+<html lang="es">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusTech - Panel de Administración</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=oxanium:wght@400;600;700&family=plus+jakarta+sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <title>Marketo — Panel de Administración</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body x-data="{ mobilemenuopen: false, currentuserrole: 'superadmin' }"
-    class="bg-background text-text font-jakarta text-body font-normal antialiased min-h-screen flex relative overflow-hidden">
+<body x-data="{ sidebarOpen: false }"
+    class="bg-background text-text font-jakarta antialiased min-h-screen flex relative overflow-hidden">
 
-    <div x-show="mobilemenuopen" @click="mobilemenuopen = false"
+    {{-- Overlay mobile --}}
+    <div x-show="sidebarOpen" @click="sidebarOpen = false"
         class="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden" x-cloak></div>
 
-    <aside :class="mobilemenuopen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-        class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-nav border-r border-border/30 flex flex-col shrink-0 transition-transform duration-300 ease-in-out">
+    {{-- ─── Sidebar ─────────────────────────────────────────────────── --}}
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+        class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-surface border-r border-border/30 flex flex-col shrink-0 transition-transform duration-300 ease-in-out">
 
-        <div class="h-16 flex items-center justify-between px-6 border-b border-border">
-            <div class="flex items-center gap-2 text-primary font-oxanium font-bold text-h4 tracking-wide">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
-                    <rect x="4" y="4" width="16" height="16" rx="2" />
-                    <rect x="9" y="9" width="6" height="6" />
-                    <path d="m9 1v3m6-3v3m-9 16v3m6-3v3m-11-13h3m-3 6h3m16-6h3m-3 6h3" />
-                </svg>
-                <span>Nexus<span class="text-text">Tech</span></span>
-            </div>
-            <button @click="mobilemenuopen = false" class="lg:hidden text-muted hover:text-text focus:outline-none">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 18 12-12m0 12l-12-12" />
+        {{-- Logo --}}
+        <div class="h-16 flex items-center justify-between px-5 border-b border-border">
+            <a href="{{ route('home') }}" class="focus:outline-none">
+                <x-app.logo />
+            </a>
+            <button @click="sidebarOpen = false" class="lg:hidden text-muted hover:text-text focus:outline-none">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 18 12-12m0 12L6 6" />
                 </svg>
             </button>
         </div>
 
+        {{-- Navegación --}}
         <nav class="flex-1 py-4 overflow-y-auto">
-            <ul class="space-y-1">
+            <p class="px-6 mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted/60">Administración</p>
+            <ul class="space-y-0.5 px-3">
                 <li>
                     <a href="{{ route('admin.dashboard') }}"
-                        class="flex items-center px-6 py-3 gap-3 text-h6 transition-colors relative {{ request()->routeIs('admin.dashboard') ? 'text-primary bg-primary/10 font-medium' : 'text-muted hover:text-text hover:bg-background/50' }}">
-                        @if (request()->routeIs('admin.dashboard'))
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-sm"></div>
+                        class="flex items-center px-3 py-2.5 gap-3 text-sm rounded-xl transition-colors relative
+                            {{ request()->routeIs('admin.dashboard') ? 'text-primary bg-primary/10 font-medium' : 'text-muted hover:text-text hover:bg-background/60' }}">
+                        @if(request()->routeIs('admin.dashboard'))
+                            <div class="absolute left-0 top-2 bottom-2 w-0.5 -ml-3 bg-primary rounded-full"></div>
                         @endif
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+                        <svg class="w-4.5 h-4.5 w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <rect x="3" y="3" width="7" height="9" rx="1" />
                             <rect x="14" y="3" width="7" height="5" rx="1" />
                             <rect x="14" y="12" width="7" height="9" rx="1" />
@@ -59,131 +52,89 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-
                 <li>
                     <a href="{{ route('admin.productos.index') }}"
-                        class="flex items-center px-6 py-3 gap-3 text-h6 transition-colors relative {{ request()->routeIs('admin.productos.*') ? 'text-primary bg-primary/10 font-medium' : 'text-muted hover:text-text hover:bg-background/50' }}">
-                        @if (request()->routeIs('admin.productos.*'))
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-sm"></div>
+                        class="flex items-center px-3 py-2.5 gap-3 text-sm rounded-xl transition-colors relative
+                            {{ request()->routeIs('admin.productos.*') ? 'text-primary bg-primary/10 font-medium' : 'text-muted hover:text-text hover:bg-background/60' }}">
+                        @if(request()->routeIs('admin.productos.*'))
+                            <div class="absolute left-0 top-2 bottom-2 w-0.5 -ml-3 bg-primary rounded-full"></div>
                         @endif
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
-                            <rect x="4" y="4" width="16" height="16" rx="2" />
-                            <rect x="9" y="9" width="6" height="6" />
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                         </svg>
-                        <span>Catálogo de Hardware</span>
+                        <span>Productos</span>
                     </a>
                 </li>
-
                 <li>
                     <a href="{{ route('admin.users.index') }}"
-                        class="flex items-center px-6 py-3 gap-3 text-h6 transition-colors relative {{ request()->routeIs('admin.users.*') ? 'text-primary bg-primary/10 font-medium' : 'text-muted hover:text-text hover:bg-background/50' }}">
-                        @if (request()->routeIs('admin.users.*'))
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-sm"></div>
+                        class="flex items-center px-3 py-2.5 gap-3 text-sm rounded-xl transition-colors relative
+                            {{ request()->routeIs('admin.users.*') ? 'text-primary bg-primary/10 font-medium' : 'text-muted hover:text-text hover:bg-background/60' }}">
+                        @if(request()->routeIs('admin.users.*'))
+                            <div class="absolute left-0 top-2 bottom-2 w-0.5 -ml-3 bg-primary rounded-full"></div>
                         @endif
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
-                            <path d="m16 21v-2a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v2" />
-                            <circle cx="8" cy="7" r="4" />
-                            <path d="m22 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="m16 3.13a4 4 0 0 1 0 7.75" />
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>
-                        <span>Clientes</span>
+                        <span>Usuarios</span>
                     </a>
                 </li>
-
             </ul>
+
+            <div class="mt-6 px-3">
+                <p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted/60">Tienda</p>
+                <a href="{{ route('home') }}"
+                    class="flex items-center px-3 py-2.5 gap-3 text-sm rounded-xl text-muted hover:text-text hover:bg-background/60 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                    <span>Ver tienda</span>
+                </a>
+            </div>
         </nav>
 
-        <div class="p-4 border-t border-border mt-auto">
-            <form method="post" action="/logout" class="block w-full">
+        {{-- Logout --}}
+        <div class="p-3 border-t border-border">
+            <div class="flex items-center gap-3 px-3 py-2 mb-1">
+                <div class="w-7 h-7 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-semibold text-xs shrink-0">
+                    {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                </div>
+                <div class="min-w-0">
+                    <p class="text-xs font-medium text-text truncate">{{ auth()->user()->name ?? 'Admin' }}</p>
+                    <p class="text-[10px] text-muted truncate">Administrador</p>
+                </div>
+            </div>
+            <form method="post" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="flex items-center w-full px-4 py-2 gap-3 text-h6 text-error hover:bg-error/10 rounded-md transition-colors focus:outline-none text-left">
-                    <svg class="w-5 h-5" fill="none" stroke="currentcolor" stroke-width="2" viewbox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m9 21h-6a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2h6m4 16 5-5-5-5m5 5h-12" />
+                <button type="submit"
+                    class="flex items-center w-full px-3 py-2 gap-3 text-sm text-error hover:bg-error/10 rounded-xl transition-colors focus:outline-none text-left">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                     </svg>
                     <span>Cerrar Sesión</span>
                 </button>
             </form>
         </div>
-
     </aside>
 
+    {{-- ─── Área principal ──────────────────────────────────────────── --}}
     <div class="flex-1 flex flex-col min-w-0 w-full">
 
-        <header class="h-16 bg-nav border-b border-border/30 flex items-center justify-between px-4 lg:px-6 shrink-0">
-            <div class="flex items-center flex-1 gap-4">
-                <button @click="mobilemenuopen = true"
-                    class="lg:hidden text-muted hover:text-text p-1 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="m3.75 6.75h16.5m-16.5 5.25h16.5m-16.5 5.25h16.5" />
-                    </svg>
-                </button>
+        {{-- Header --}}
+        <header class="h-14 bg-surface border-b border-border/30 flex items-center justify-between px-4 lg:px-6 shrink-0">
+            <button @click="sidebarOpen = true" class="lg:hidden text-muted hover:text-text p-1 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5m-16.5 5.25h16.5m-16.5 5.25h16.5" />
+                </svg>
+            </button>
 
-
-            </div>
-
-            <div class="flex items-center gap-4 lg:gap-6 ml-4">
-
-                <div x-data="{ dropdownopen: false }" class="relative">
-                    <div @click="dropdownopen = !dropdownopen"
-                        class="flex items-center gap-3 pl-4 lg:pl-6 border-l border-border cursor-pointer select-none">
-                        <div
-                            class="w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-background flex items-center justify-center overflow-hidden border border-border">
-                            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=200&auto=format&fit=crop"
-                                alt="admin avatar" class="w-full h-full object-cover" />
-                        </div>
-                        <div class="hidden md:flex flex-col">
-                            <span class="text-small font-medium leading-none mb-1">Alex Mercer</span>
-                            <span x-text="currentuserrole"
-                                class="text-label text-muted leading-none capitalize"></span>
-                        </div>
-                    </div>
-
-                    <div x-show="dropdownopen" @click.away="dropdownopen = false"
-                        class="absolute right-0 mt-2 w-56 bg-surface border border-border rounded-lg shadow-2xl z-50 p-1"
-                        x-cloak style="display: none;">
-
-                        <button @click="currentuserrole = 'superadmin'; dropdownopen = false"
-                            :class="currentuserrole === 'superadmin' ? 'bg-primary/10 text-primary' :
-                                'text-text hover:bg-background'"
-                            class="w-full flex items-center gap-2 px-2 py-2 text-small rounded-md text-left transition-colors focus:outline-none">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-                                viewbox="0 0 24 24">
-                                <circle cx="12" cy="12" r="3" />
-                                <path
-                                    d="m19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51v.1a2 2 0 0 1-4 0v-.1a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51v-.09a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1h.09a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                            </svg>
-                            <span>SuperAdmin</span>
-                        </button>
-
-                        <div class="h-px bg-border my-1"></div>
-
-                        <a href="/profile"
-                            class="flex items-center gap-2 px-2 py-2 text-small text-text hover:bg-background rounded-md transition-colors">
-                            <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" stroke-width="2"
-                                viewbox="0 0 24 24">
-                                <path d="m19 21v-2a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                            </svg>
-                            <span>Mi Perfil</span>
-                        </a>
-
-                        <form method="post" action="/logout" class="block w-full">
-                            @csrf
-                            <button type="submit"
-                                class="w-full flex items-center gap-2 px-2 py-2 text-small text-error hover:bg-error/10 rounded-md text-left transition-colors focus:outline-none">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewbox="0 0 24 24">
-                                    <path d="m9 21h-6a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2h6m4 16 5-5-5-5m5 5h-12" />
-                                </svg>
-                                <span>Cerrar Sesión</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
+            <div class="flex items-center gap-2 ml-auto">
+                <span class="text-xs text-muted hidden sm:inline">Panel de administración</span>
+                <div class="w-px h-4 bg-border hidden sm:block"></div>
+                <span class="text-xs font-medium text-primary">Marketo</span>
             </div>
         </header>
 
+        {{-- Contenido --}}
         <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 lg:p-6 bg-background">
             <div class="max-w-[1440px] mx-auto w-full">
                 @yield('content')

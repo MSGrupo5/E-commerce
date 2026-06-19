@@ -15,8 +15,8 @@ class UserController extends Controller
     public function index(Request $request): View
     {
         $users = User::when($request->filled('status'), function ($q) use ($request) {
-                $q->where('is_active', $request->status === 'active');
-            })
+            $q->where('is_active', $request->status === 'active');
+        })
             ->latest()
             ->paginate(20);
 
@@ -29,7 +29,7 @@ class UserController extends Controller
             return back()->with('error', 'No se puede desactivar un administrador.');
         }
 
-        $user->update(['is_active' => !$user->is_active]);
+        $user->update(['is_active' => ! $user->is_active]);
 
         $status = $user->is_active ? 'activado' : 'desactivado';
 

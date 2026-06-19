@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\belongsTo;
 use Illuminate\Support\Str;
 
 class Category extends Model
@@ -25,7 +24,7 @@ class Category extends Model
             $counter = 2;
 
             while (Category::where('slug', $slug)->exists()) {
-                $slug = $original . '-' . $counter;
+                $slug = $original.'-'.$counter;
                 $counter++;
             }
 

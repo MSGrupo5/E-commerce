@@ -1,25 +1,19 @@
-@extends('seller.layout')
-
-@section('seller-content')
+<x-seller-layout>
     <div class="mb-6">
         <h1 class="text-h3 font-oxanium font-bold text-text">Pedidos Recibidos</h1>
         <p class="text-muted text-small">Pedidos que contienen productos de tu catálogo</p>
     </div>
 
     @if($orders->isEmpty())
-        <div class="rounded-3xl border border-border bg-surface p-12 text-center">
-            <svg class="w-16 h-16 text-muted/40 mx-auto mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <circle cx="8" cy="21" r="1" />
-                <circle cx="19" cy="21" r="1" />
-                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-            </svg>
-            <p class="text-h5 font-oxanium font-semibold text-text mb-1">No hay pedidos todavía</p>
-            <p class="text-muted text-small">Cuando un cliente compre uno de tus productos, aparecerá acá.</p>
-        </div>
+        <x-ui.empty-state
+            icon='<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>'
+            title="No hay pedidos todavía"
+            description="Cuando un cliente compre uno de tus productos, aparecerá acá."
+        />
     @else
         <div class="space-y-4">
             @foreach($orders as $order)
-                <div class="rounded-2xl border border-border bg-surface p-5">
+                <div class="rounded-2xl border border-border bg-background p-5">
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <p class="text-small font-medium text-text">Pedido #{{ $order->id }}</p>
@@ -61,8 +55,8 @@
                                     <tr class="border-b border-border/50 last:border-b-0">
                                         <td class="py-2 text-small text-text">{{ $item->product?->name ?? 'Producto eliminado' }}</td>
                                         <td class="py-2 text-small text-muted">{{ $item->quantity }}</td>
-                                        <td class="py-2 text-small text-muted">${{ number_format($item->price, 2) }}</td>
-                                        <td class="py-2 text-small text-text font-medium">${{ number_format($item->price * $item->quantity, 2) }}</td>
+                                        <td class="py-2 text-small text-muted">${{ number_format($item->price, 0, ',', '.') }}</td>
+                                        <td class="py-2 text-small text-text font-medium">${{ number_format($item->price * $item->quantity, 0, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -71,7 +65,7 @@
 
                     <div class="mt-3 text-right">
                         <p class="text-small text-muted">
-                            Total del pedido: <span class="text-text font-semibold">${{ number_format($order->total, 2) }}</span>
+                            Total del pedido: <span class="text-text font-semibold">${{ number_format($order->total, 0, ',', '.') }}</span>
                         </p>
                     </div>
                 </div>
@@ -82,4 +76,4 @@
             {{ $orders->links() }}
         </div>
     @endif
-@endsection
+</x-seller-layout>

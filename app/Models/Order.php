@@ -16,12 +16,13 @@ class Order extends Model
         'total',
         'status',
         'shipping_address',
+        'payment_method',
     ];
 
     protected function casts(): array
     {
         return [
-            'total'  => 'decimal:2',
+            'total' => 'decimal:2',
             'status' => 'string',
         ];
     }

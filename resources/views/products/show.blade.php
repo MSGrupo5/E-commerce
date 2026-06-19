@@ -11,7 +11,7 @@
             <div class="lg:col-span-3 rounded-3xl border border-border bg-surface p-4 sm:p-6">
                 <div class="overflow-hidden rounded-2xl bg-background">
                     <img
-                        src="{{ $product->image }}"
+                        src="{{ $product->image_url }}"
                         alt="{{ $product->name }}"
                         class="h-64 sm:h-80 lg:h-96 w-full object-contain object-center"
                         onerror="this.src='https://via.placeholder.com/720x420?text=Sin+imagen'"
@@ -26,12 +26,33 @@
                             {{ optional($product->category)->name ?? 'Sin categoría' }}
                         </span>
 
-                        <button type="button" class="inline-flex items-center gap-2 rounded-2xl border border-border bg-background/90 px-4 py-3 text-sm font-semibold text-text transition hover:border-primary/70 hover:text-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                            </svg>
-                            Favorito
-                        </button>
+                        {{-- Botón favorito --}}
+                        @auth
+                            <form action="{{ route('favorites.toggle', $product) }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                    class="inline-flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition
+                                        {{ $isFavorite
+                                            ? 'border-error/30 bg-error/10 text-error hover:bg-error/20'
+                                            : 'border-border bg-background/90 text-text hover:border-primary/70 hover:text-primary' }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                                        fill="{{ $isFavorite ? 'currentColor' : 'none' }}"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                    </svg>
+                                    {{ $isFavorite ? 'En favoritos' : 'Favorito' }}
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}"
+                                class="inline-flex items-center gap-2 rounded-2xl border border-border bg-background/90 px-4 py-3 text-sm font-semibold text-text transition hover:border-primary/70 hover:text-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                </svg>
+                                Favorito
+                            </a>
+                        @endauth
                     </div>
 
                     <div class="space-y-2">
@@ -41,8 +62,16 @@
 
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <p class="text-2xl sm:text-3xl font-bold text-primary">${{ number_format($product->price, 0, ',', '.') }}</p>
-                            <p class="mt-1 text-sm text-muted">Precio final</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-primary">
+                                ${{ number_format($product->price, 0, ',', '.') }}
+                            </p>
+                            @if(isset($usdToArs) && $usdToArs > 0)
+                                <p class="text-sm text-muted mt-0.5">
+                                    ≈ USD {{ number_format($product->price / $usdToArs, 0, ',', '.') }}
+                                    <span class="text-xs text-muted/60">(dólar blue)</span>
+                                </p>
+                            @endif
+                            <p class="mt-1 text-xs text-muted/70">Precio final en pesos</p>
                         </div>
                         <div class="rounded-3xl border border-border bg-background px-4 py-3 text-sm font-semibold {{ $product->stock > 0 ? 'text-primary' : 'text-error' }}">
                             {{ $product->stock > 0 ? $product->stock . ' unidades disponibles' : 'Agotado' }}

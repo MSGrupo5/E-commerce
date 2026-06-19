@@ -17,7 +17,7 @@ class Cart extends Model
 
     // --- Métodos estáticos ---
 
-    public static function getOrCreate(\App\Models\User $user): self
+    public static function getOrCreate(User $user): self
     {
         return self::firstOrCreate(['user_id' => $user->id]);
     }

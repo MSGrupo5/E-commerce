@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,14 +21,31 @@ class Product extends Model
         'price',
         'stock',
         'image',
+        'is_active',
     ];
 
     protected function casts(): array
     {
         return [
-            'price' => 'float',
-            'stock' => 'integer',
+            'price'     => 'float',
+            'stock'     => 'integer',
+            'is_active' => 'boolean',
         ];
+    }
+
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::get(function () {
+            if (! $this->image) {
+                return null;
+            }
+
+            if (str_starts_with($this->image, 'http')) {
+                return $this->image;
+            }
+
+            return asset('storage/'.$this->image);
+        });
     }
 
     // --- Helpers ---
@@ -41,11 +59,7 @@ class Product extends Model
 
     public function scopeSearch(Builder $query, string $term): void
     {
-        $query->where(function ($q) use ($term) {
-            $q->where('name', 'LIKE', "%{$term}%")
-              ->orWhere('description', 'LIKE', "%{$term}%")
-              ->orWhereHas('seller', fn($uq) => $uq->where('name', 'LIKE', "%{$term}%"));
-        });
+        $query->where('name', 'LIKE', "%{$term}%");
     }
 
     // --- Relaciones ---

@@ -1,14 +1,68 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\UserCatalogController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Seller\DashboardController;
+use App\Http\Controllers\Seller\OrderController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [ProductController::class, 'index'])->name('home');
+// ─── Catálogo público ────────────────────────────────────────────────────────
 
+Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
+Route::get('/productos/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/search', [ProductController::class, 'search'])->name('products.search');
+
+// ─── Carrito (público: guests y usuarios autenticados) ───────────────────────
+
+Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
+Route::post('/carrito', [CartController::class, 'store'])->name('cart.add');
+
+Route::middleware('auth')->group(function () {
+    Route::patch('/carrito/{cartItem}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/carrito/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
+
+    // Favoritos
+    Route::get('/favoritos', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favoritos/{product}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+});
+
+// ─── Checkout (requiere autenticación) ──────────────────────────────────────
+
+Route::middleware('auth')->prefix('pedido')->name('checkout.')->group(function () {
+    Route::get('/', [CheckoutController::class, 'index'])->name('index');
+    Route::post('/', [CheckoutController::class, 'store'])->name('store');
+    Route::get('/{order}/confirmacion', [CheckoutController::class, 'confirmacion'])->name('confirmacion');
+});
+
+// ─── Perfil ──────────────────────────────────────────────────────────────────
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// ─── Panel vendedor ──────────────────────────────────────────────────────────
+
+Route::prefix('panel')
+    ->middleware('auth')
+    ->name('seller.')
+    ->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::resource('productos', App\Http\Controllers\Seller\ProductController::class)
+            ->parameters(['productos' => 'product']);
+        Route::patch('productos/{product}/toggle-activo', [App\Http\Controllers\Seller\ProductController::class, 'toggleActivo'])
+            ->name('productos.toggle-activo');
+        Route::get('pedidos', [OrderController::class, 'index'])->name('orders');
+        Route::get('compras', [App\Http\Controllers\Seller\ComprasController::class, 'index'])->name('compras');
+    });
+
+// ─── Panel administrador ─────────────────────────────────────────────────────
 
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
@@ -21,51 +75,13 @@ Route::prefix('admin')
             ->parameters(['productos' => 'product'])
             ->only(['index', 'destroy']);
 
-        Route::get('usuarios', [App\Http\Controllers\Admin\UserController::class, 'index'])
+        Route::get('usuarios', [UserController::class, 'index'])
             ->name('users.index');
 
-        Route::patch('usuarios/{user}/toggle', [App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])
+        Route::patch('usuarios/{user}/toggle', [UserController::class, 'toggleStatus'])
             ->name('users.toggle');
     });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+require __DIR__.'/auth.php';
 
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart', [CartController::class, 'store'])->name('cart.add');
-    Route::patch('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
-    Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
-});
-
-Route::prefix('panel')
-    ->middleware('auth')
-    ->name('seller.')
-    ->group(function () {
-        Route::get('/', [App\Http\Controllers\Seller\DashboardController::class, 'index'])->name('dashboard');
-        Route::resource('productos', App\Http\Controllers\Seller\ProductController::class)->parameters(['productos' => 'product']);
-        Route::get('pedidos', [App\Http\Controllers\Seller\OrderController::class, 'index'])->name('orders');
-    });
-
-Route::get('/search', [ProductController::class, 'search'])
-    ->name('products.search');
-
-Route::get('/productos/{product}', [ProductController::class, 'show'])
-    ->name('products.show');
-
-Route::middleware('auth')->prefix('profile/catalog')->name('profile.catalog.')->group(function () {
-    Route::post('/', [UserCatalogController::class, 'store'])->name('store');
-    Route::patch('/{product}', [UserCatalogController::class, 'update'])->name('update');
-    Route::delete('/{product}', [UserCatalogController::class, 'destroy'])->name('destroy');
-});
-
-Route::get('/carrito', [CartController::class, 'index'])
-    ->name('cart.index')
-    ->middleware('auth');
-
-require __DIR__ . '/auth.php';
-
-Route::get('/error', function () {
-    return view('errors.404');
-});
+Route::get('/error', fn () => view('errors.404'));
