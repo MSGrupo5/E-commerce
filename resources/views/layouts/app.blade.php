@@ -23,7 +23,7 @@
 
         <div class="max-w-screen-xl mx-auto px-4 md:px-8 h-14 md:h-16 flex items-center justify-between gap-6">
 
-            <a href="/app" class="flex items-center gap-2 shrink-0 focus:outline-none">
+            <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0 focus:outline-none">
                 <svg class="w-5 h-5 md:w-6 md:h-6 text-primary" fill="none" stroke="currentColor" stroke-width="2"
                     viewbox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
