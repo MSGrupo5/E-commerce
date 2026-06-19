@@ -56,7 +56,6 @@ class MercadoPagoService
                 'failure' => route('checkout.mp.callback', ['status' => 'failure']),
                 'pending' => route('checkout.mp.callback', ['status' => 'pending']),
             ],
-            'auto_return' => 'approved',
             'statement_descriptor' => 'Marketo',
         ];
 
