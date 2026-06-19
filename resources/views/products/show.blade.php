@@ -36,7 +36,18 @@
 
                     <div class="space-y-2">
                         <h2 class="text-4xl font-semibold text-text sm:text-5xl">{{ $product->name }}</h2>
-                        <p class="text-sm text-muted">SKU #{{ $product->id }}</p>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+                            <p>SKU #{{ $product->id }}</p>
+                            @if($product->seller)
+                                <span class="text-border">|</span>
+                                <div class="flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    <span>Vendedor: <span class="font-medium text-text">{{ $product->seller->name }}</span></span>
+                                </div>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
