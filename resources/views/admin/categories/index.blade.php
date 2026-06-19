@@ -170,7 +170,7 @@
                 </form>
 
                 {{-- Edit form --}}
-                <form x-ref="editForm" method="POST" :action="`{{ route('admin.categorias.update', '') }}/${editId}`" x-show="editing">
+                <form x-ref="editForm" method="POST" :action="`/admin/categorias/${editId}`" x-show="editing">
                     @csrf
                     @method('PATCH')
                     <div class="space-y-4">
