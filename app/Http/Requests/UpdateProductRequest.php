@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\SinContenidoOfensivo;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProductRequest extends FormRequest
@@ -14,9 +15,9 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'name' => ['required', 'string', 'max:255', new SinContenidoOfensivo],
+            'description' => ['nullable', 'string', 'max:1000', new SinContenidoOfensivo],
+            'price' => ['required', 'numeric', 'min:1', 'max:99999999'],
             'stock' => ['required', 'integer', 'min:0'],
             'category_id' => ['required', 'exists:categories,id'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
