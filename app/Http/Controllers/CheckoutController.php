@@ -9,6 +9,7 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
@@ -46,26 +47,30 @@ class CheckoutController extends Controller
 
         $total = $cart->items->sum(fn ($item) => $item->product->price * $item->quantity);
 
-        $order = Order::create([
-            'user_id'         => auth()->id(),
-            'total'           => $total,
-            'status'          => 'pending',
-            'shipping_address' => $request->shipping_address,
-            'payment_method'  => $request->payment_method,
-        ]);
-
-        foreach ($cart->items as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'price' => $item->product->price,
+        $order = DB::transaction(function () use ($cart, $request, $total) {
+            $order = Order::create([
+                'user_id'          => auth()->id(),
+                'total'            => $total,
+                'status'           => 'pending',
+                'shipping_address' => $request->shipping_address,
+                'payment_method'   => $request->payment_method,
             ]);
 
-            $item->product->decrement('stock', $item->quantity);
-        }
+            foreach ($cart->items as $item) {
+                OrderItem::create([
+                    'order_id'   => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity'   => $item->quantity,
+                    'price'      => $item->product->price,
+                ]);
 
-        $cart->items()->delete();
+                $item->product->decrement('stock', $item->quantity);
+            }
+
+            $cart->items()->delete();
+
+            return $order;
+        });
 
         return redirect()->route('checkout.confirmacion', $order)
             ->with('success', '¡Pedido realizado con éxito!');

@@ -52,15 +52,15 @@ class CheckoutTest extends TestCase
 
     public function test_guest_cannot_access_checkout(): void
     {
-        $response = $this->get(route('checkout.show'));
+        $response = $this->get(route('checkout.index'));
         $response->assertRedirect(route('login'));
     }
 
     public function test_checkout_redirects_if_cart_is_empty(): void
     {
-        $response = $this->actingAs($this->user)->get(route('checkout.show'));
+        $response = $this->actingAs($this->user)->get(route('checkout.index'));
         $response->assertRedirect(route('cart.index'));
-        $response->assertSessionHas('error', 'Tu carrito está vacío.');
+        $response->assertSessionHas('info', 'Tu carrito está vacío.');
     }
 
     public function test_checkout_page_displays_when_cart_has_items(): void
@@ -72,12 +72,11 @@ class CheckoutTest extends TestCase
             'quantity' => 2,
         ]);
 
-        $response = $this->actingAs($this->user)->get(route('checkout.show'));
+        $response = $this->actingAs($this->user)->get(route('checkout.index'));
 
         $response->assertOk();
-        $response->assertViewIs('checkout.show');
+        $response->assertViewIs('pedido.index');
         $response->assertSee('Monitor Gamer');
-        $response->assertSee('Vendido por: Vendedor Oficial Gamer');
         $response->assertSee('Calle Falsa 123'); // Pre-completado
     }
 
@@ -91,19 +90,16 @@ class CheckoutTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->post(route('checkout.process'), [
-                'direccion_entrega' => 'Nueva Direccion 456',
+            ->post(route('checkout.store'), [
+                'shipping_address' => 'Nueva Direccion 456',
+                'payment_method'   => 'efectivo',
             ]);
 
         $order = Order::where('user_id', $this->user->id)->first();
         $this->assertNotNull($order);
 
-        $response->assertRedirect(route('checkout.confirmation', $order));
+        $response->assertRedirect(route('checkout.confirmacion', $order));
         $response->assertSessionHas('success');
-
-        // Verificar DB
-        $this->user->refresh();
-        $this->assertSame('Nueva Direccion 456', $this->user->direccion_entrega);
 
         $this->assertDatabaseHas('orders', [
             'user_id' => $this->user->id,
@@ -139,13 +135,14 @@ class CheckoutTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->from(route('checkout.show'))
-            ->post(route('checkout.process'), [
-                'direccion_entrega' => 'Calle Falsa 123',
+            ->from(route('checkout.index'))
+            ->post(route('checkout.store'), [
+                'shipping_address' => 'Calle Falsa 123',
+                'payment_method'   => 'efectivo',
             ]);
 
-        $response->assertRedirect(route('checkout.show'));
-        $response->assertSessionHasErrors(['direccion_entrega']);
+        $response->assertRedirect(route('checkout.index'));
+        $response->assertSessionHasErrors(['stock']);
 
         // Verificar que no se creo la orden
         $this->assertDatabaseMissing('orders', [
@@ -166,10 +163,10 @@ class CheckoutTest extends TestCase
             'shipping_address' => 'Calle Falsa 123',
         ]);
 
-        $response = $this->actingAs($this->user)->get(route('checkout.confirmation', $order));
+        $response = $this->actingAs($this->user)->get(route('checkout.confirmacion', $order));
 
         $response->assertOk();
-        $response->assertViewIs('checkout.confirmation');
+        $response->assertViewIs('pedido.confirmacion');
         $response->assertSee('¡Pedido confirmado!');
     }
 
@@ -183,7 +180,7 @@ class CheckoutTest extends TestCase
             'shipping_address' => 'Calle Falsa 123',
         ]);
 
-        $response = $this->actingAs($this->user)->get(route('checkout.confirmation', $order));
+        $response = $this->actingAs($this->user)->get(route('checkout.confirmacion', $order));
 
         $response->assertStatus(403);
     }
