@@ -96,6 +96,16 @@ FILESYSTEM_DISK=public
 
 ---
 
+## Manejo de imágenes de productos
+
+- **Almacenamiento**: `storage/app/public/products/` (disco `public` de Laravel)
+- **Acceso público**: requiere `php artisan storage:link` después de clonar el repositorio (ver paso 9 de Instalación)
+- **Validación**: `nullable|image|mimes:jpeg,png,jpg,webp|max:2048` — imagen opcional, hasta 2 MB, formatos JPEG/PNG/WebP
+- **Actualización**: al subir una nueva imagen en `update()`, la imagen anterior se elimina automáticamente del storage
+- **Eliminación**: al eliminar un producto sin pedidos asociados (force delete), su imagen también se borra
+
+---
+
 ## Flujo de Trabajo Git
 
 ```

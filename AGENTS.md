@@ -18,6 +18,15 @@ npm run build / npm run dev
 # Single test: php artisan test --filter=NombreTest
 ```
 
+## Convenciones de código
+- **Tipado**: Usar `declare(strict_types=1)` en nuevos archivos
+- **Modelos**: `$fillable`, `$casts`, Type hints en relaciones (BelongsTo/HasMany/HasOne), helpers booleanos (isX()), scopes con `Builder`
+- **Controladores**: Route Model Binding, `compact()` para pasar datos a vistas
+- **Blade**: Componentes con `@props`, clases Tailwind con sintaxis oscura (`bg-background`, `text-muted`, `border-border`, `bg-primary`, `text-primary`, `text-error`)
+- **Tailwind theme**: custom colors `background:#0b0b0f`, `surface:#141419`, `border:#1e1e2a`, `primary:#6c63ff`, `accent:#00d4ff`, `text:#f1f5f9`, `muted:#94a3b8`
+- **Alpine.js**: Para interactividad cliente (modales, dropdowns, toggle password visibility)
+- **Idioma**: UI en español, hardcoded (sin archivos de traducción)
+- **Validación de imagen**: `nullable|image|mimes:jpeg,png,jpg,webp|max:2048` en todos los controllers con subida de imágenes (Seller, UserCatalog)
 ## Roles
 - `admin` — full access via `admin` middleware (alias in `bootstrap/app.php`)
 - `usuario` — default for new registrations
