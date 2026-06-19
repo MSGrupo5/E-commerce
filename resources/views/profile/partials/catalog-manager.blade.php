@@ -107,7 +107,7 @@
                 <div class="flex items-center gap-4 rounded-2xl border border-border bg-background p-4">
                     <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-surface">
                         @if ($product->image)
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="h-full w-full object-cover" onerror="this.style.display='none'" />
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="h-full w-full object-cover" onerror="this.style.display='none'" />
                         @endif
                     </div>
                     <div class="min-w-0 flex-1">

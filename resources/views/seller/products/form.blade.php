@@ -73,7 +73,7 @@
                     @if(isset($product) && $product->image)
                         <div class="mb-3">
                             <p class="text-xs text-muted mb-2">Imagen actual:</p>
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-32 h-32 rounded-xl object-cover border border-border">
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-32 h-32 rounded-xl object-cover border border-border">
                         </div>
                     @endif
                     <div class="flex items-center gap-4">

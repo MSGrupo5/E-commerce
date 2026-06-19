@@ -62,7 +62,7 @@
                     <span class="hidden md:inline text-sm font-medium">Favoritos</span>
                 </a>
 
-                <div class="flex items-center gap-2 text-muted transition-colors relative group">
+                <a href="{{ route('cart.index') }}" class="flex items-center gap-2 text-muted hover:text-text transition-colors relative group">
                     <div class="relative">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -78,7 +78,7 @@
                         </span>
                     </div>
                     <span class="hidden md:inline text-sm font-medium">Carrito</span>
-                </div>
+                </a>
 
                 <div class="hidden md:block">
                     @if (auth()->check())

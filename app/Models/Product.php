@@ -30,6 +30,20 @@ class Product extends Model
         ];
     }
 
+    public function getImageUrlAttribute(): string
+    {
+        if (!$this->image) {
+            return 'https://placehold.co/600x400?text=Sin+imagen';
+        }
+
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        return asset('storage/' . $this->image);
+    }
+
+
     // --- Helpers ---
 
     public function inStock(): bool
