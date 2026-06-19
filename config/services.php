@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'azure_content_safety' => [
+        'endpoint' => env('AZURE_CONTENT_SAFETY_ENDPOINT'), // ej: mi-recurso (sin https://)
+        'key'      => env('AZURE_CONTENT_SAFETY_KEY'),
+    ],
+
 ];
