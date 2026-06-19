@@ -1,59 +1,21 @@
-# NexusTech E-commerce — Contexto del Proyecto
+# NexusTech E-commerce
 
 ## Stack
-- **Backend**: Laravel 12, PHP ^8.2
-- **Frontend**: Tailwind CSS v3 (dark theme), Alpine.js 3, Blade, Vite 7
-- **Database**: MySQL (`ecommerce`, root/doki2020)
+- **Backend**: Laravel 12 / PHP ^8.2
+- **Frontend**: Tailwind CSS 3, Alpine.js 3, Blade, Vite 7
 - **Auth**: Laravel Breeze (session-based)
+- **DB**: MySQL (`ecommerce_db`) — SQLite in-memory for tests (`phpunit.xml`)
+- **Mail**: `MAIL_MAILER=log` — password reset links in `storage/logs/laravel.log`
 
-## Estructura de directorios
-```
-app/
-  Http/
-    Controllers/
-      Auth/        -- AuthenticatedSession, RegisteredUser, Password, VerifyEmail, etc.
-      Controller.php
-      ProductController.php    -- index (paginate 12), show (check is_active)
-      ProfileController.php    -- edit, update, destroy
-    Middleware/
-      EnsureUserIsAdmin.php    -- checks isAdmin(), abort(403)
-    Requests/
-      Auth/LoginRequest.php    -- rate limit (5 attempts)
-      ProfileUpdateRequest.php -- name, email, apellido, direccion_entrega
-  Models/
-    User.php       -- role (cliente|admin), cart(), orders(), favorites()
-    Product.php    -- category(), cartItems(), orderItems(), favorites(), scopeSearch, inStock()
-    Category.php   -- products()
-    Cart.php       -- user(), items()
-    CartItem.php   -- cart(), product()
-    Order.php      -- user(), items(), isPending/isPaid/isCancelled
-    OrderItem.php  -- order(), product()
-    Favorite.php   -- user(), product()
-  Providers/
-    AppServiceProvider.php     -- empty
-  View/Components/
-    AppLayout.php, GuestLayout.php
-bootstrap/app.php              -- alias 'admin' => EnsureUserIsAdmin
-routes/
-  web.php         -- /, /productos, /dashboard, /profile, /productos/{product}
-  auth.php        -- register, login, password, verify, logout
-  console.php     -- inspire
-database/
-  migrations/     -- 14 migrations (users, products, categories, carts, orders, etc.)
-  seeders/        -- DatabaseSeeder, CategorySeeder, ProductSeeder
-resources/views/
-  layouts/
-    app.blade.php         -- Frontend layout (NexusTech header/search/cart/favorites/footer)
-    admin.blade.php       -- Admin panel layout (sidebar, role switcher UI)
-    guest.blade.php       -- Auth pages layout
-  products/
-    index.blade.php       -- Product grid + category filter + pagination
-    show.blade.php        -- **NO EXISTE** (referenciado por ProductController)
-  auth/                   -- register, login, forgot-password, reset-password, verify-email
-  profile/                -- edit, partials (delete-user, update-password, update-profile)
-  components/ui/
-    product-card.blade.php    -- Card with image, favorite toggle, price, stock, cart button
-    category-filter.blade.php -- Sidebar category filter (hardcoded sample data as fallback)
+## Commands
+```bash
+composer run dev       # php artisan serve + queue:listen + npm run dev (concurrently)
+composer run test      # config:clear + php artisan test
+./vendor/bin/pint      # Laravel Pint formatting
+php artisan migrate:fresh --seed
+php artisan storage:link   # required once after clone
+npm run build / npm run dev
+# Single test: php artisan test --filter=NombreTest
 ```
 
 ## Convenciones de código
@@ -64,36 +26,58 @@ resources/views/
 - **Tailwind theme**: custom colors `background:#0b0b0f`, `surface:#141419`, `border:#1e1e2a`, `primary:#6c63ff`, `accent:#00d4ff`, `text:#f1f5f9`, `muted:#94a3b8`
 - **Alpine.js**: Para interactividad cliente (modales, dropdowns, toggle password visibility)
 - **Idioma**: UI en español, hardcoded (sin archivos de traducción)
+- **Validación de imagen**: `nullable|image|mimes:jpeg,png,jpg,webp|max:2048` en todos los controllers con subida de imágenes (Seller, UserCatalog)
+## Roles
+- `admin` — full access via `admin` middleware (alias in `bootstrap/app.php`)
+- `usuario` — default for new registrations
+- Any authenticated user can sell via `/panel` routes (no seller role column)
+- ProductPolicy gates ownership: owner (`user_id`) or admin can update/delete
 
-## Estado actual y pendientes conocidos
+## Route Groups
+| Prefix | Middleware | Name | Purpose |
+|--------|-----------|------|---------|
+| `/` | — | `home`, `products.*` | Public catalog |
+| `/admin` | `auth`, `admin` | `admin.` | Admin panel |
+| `/panel` | `auth` | `seller.` | Seller panel |
+| `/profile` | `auth` | `profile.*` | User profile |
+| `/cart` | `auth` | `cart.*` | Shopping cart (already implemented) |
 
-### Completado
-- Auth completo (register, login, logout, password reset, email verification)
-- Productos: listado con paginación, categorías, búsqueda (scope)
-- Perfil de usuario: editar nombre, apellido, email, direccion_entrega
-- Layouts: frontend (NexusTech) y admin (panel con sidebar)
-- Migraciones: todas las tablas creadas (users, products, categories, carts, orders, etc.)
-- Seeders: CategorySeeder + ProductSeeder
-- Admin middleware registrado como alias 'admin'
+## Controller Namespaces
+- `App\Http\Controllers\` — public (ProductController, CartController, UserCatalogController)
+- `App\Http\Controllers\Admin\` — DashboardController, ProductController, UserController
+- `App\Http\Controllers\Seller\` — DashboardController, ProductController, OrderController
 
-### Pendiente / Incompleto
-1. **`products.show`** — La vista no existe (ProductController::show la referencia)
-2. **Migración `add_direccion_entrega_to_users_table`** — Tiene `up()` y `down()` vacíos (solo `//`)
-3. **Carrito** — Los modelos Cart/CartItem existen, pero no hay rutas, controladores ni lógica backend. La UI referencia `route('cart.add')`
-4. **Favoritos** — Modelo Favorite existe, pero no hay ruta `favorites.toggle` ni controlador
-5. **Órdenes** — Modelos Order/OrderItem existen, pero no hay lógica de checkout
-6. **Admin panel** — Las vistas admin/ están vacías. El layout admin tiene navegación a `/catalog`, `/orders`, `/clients`, `/roles` sin rutas backend
-7. **Búsqueda** — El formulario de búsqueda apunta a `GET /search` sin ruta definida
-8. **Rutas faltantes** en vistas: `/cart`, `/favorites`, `/orders`, `/catalog`, `/search`, `/support`, `/shipping`, `/warranty`, `/terms`, `/privacy`
-9. **Paginación personalizada** — `vendor/pagination/` está vacío (usa defaults de Laravel)
-10. **Role switcher en admin** — Es solo UI con Alpine.js (no hay roles más allá de cliente/admin)
+Both `Admin\ProductController` and `Seller\ProductController` exist — watch imports.
 
-## Comandos útiles
-```bash
-npm run dev          # Iniciar Vite dev server
-php artisan serve    # Iniciar Laravel dev server
-php artisan migrate:fresh --seed  # Reset DB + seed
-php artisan make:controller NombreController
-php artisan make:model Nombre -m
-php artisan make:middleware Nombre
-```
+## Key Gotchas
+- **`is_active` not in `Product::$fillable`** — seeder sets it but mass-assignment may fail
+- **`direccion_entrega` migration has empty `up()`/`down()`** — column in `$fillable` & `ProfileUpdateRequest` but may not exist in DB
+- **CartController is fully implemented** — do not recreate. Use `Cart::getOrCreate($user)` as entry point
+- **`UserCatalogController` exists** — lets users manage their own products from profile
+- **`Product::seller()` and `Product::user()`** both point to `User` via `user_id` — `seller()` is the alias used in views
+- **`scopeSearch()`** searches `name`, `description`, and seller's `name`
+- **Product images** stored via `Storage::disk('public')` under `products/`
+- **Admin views currently use `x-app-layout`** — `layouts.admin.blade.php` exists with sidebar but no views use it yet
+- **Two fonts**: `font-oxanium` (headings) + `font-jakarta` (body); Figtree is Blade default fallback
+- **Tailwind tokens**: `background:#0b0b0f`, `surface:#141419`, `border:#1e1e2a`, `primary:#6c63ff`, `accent:#00d4ff`, `text:#f1f5f9`, `muted:#94a3b8`, `success:#10b981`, `error:#ef4444`, `warning:#f59e0b`
+- **`Route::has('favorites.toggle')` returns false** — Favorite model exists but no routes/controller
+- **login/register routes** are in `routes/auth.php` (Breeze), do not duplicate in `web.php`
+
+## Tests
+- `tests/Feature/` for HTTP tests, `tests/Unit/` for logic
+- Use `RefreshDatabase`; test names in Spanish (`test_usuario_puede_...`)
+- CI: runs on ubuntu-latest with MySQL service, `composer install`, `npm run build`, `php artisan test`
+
+## Pending Features
+- Favorites toggle (model exists, no routes)
+- Checkout / Order creation flow
+- Admin: orders, clients, roles views
+- Checkout flow not wired to create Orders from Cart
+- Role switcher in admin UI is Alpine.js only — no backend
+
+## Layouts
+- `<x-app-layout>` — main storefront (authenticated)
+- `<x-guest-layout>` — auth pages
+- `<x-admin-layout>` — admin panel (sidebar exists, unused by views)
+- `<x-seller-layout>` — seller panel
+- `@vite(['resources/css/app.css', 'resources/js/app.js'])` in layouts

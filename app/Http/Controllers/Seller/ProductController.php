@@ -35,7 +35,7 @@ class ProductController extends Controller
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image'       => 'nullable|image|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
@@ -76,7 +76,7 @@ class ProductController extends Controller
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image'       => 'nullable|image|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
@@ -96,11 +96,15 @@ class ProductController extends Controller
     {
         $this->authorize('delete', $product);
 
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
+        if ($product->orderItems()->exists()) {
+            $product->delete();
+        } else {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
 
-        $product->delete();
+            $product->forceDelete();
+        }
 
         return redirect()->route('seller.productos.index')
             ->with('success', 'Producto eliminado correctamente.');

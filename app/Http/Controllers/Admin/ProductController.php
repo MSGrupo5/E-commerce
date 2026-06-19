@@ -29,7 +29,11 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
-        $product->delete();
+        if ($product->orderItems()->exists()) {
+            $product->delete();
+        } else {
+            $product->forceDelete();
+        }
 
         return to_route('admin.productos.index')
             ->with('success', "Producto «{$product->name}» eliminado.");

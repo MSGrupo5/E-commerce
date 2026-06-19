@@ -113,10 +113,6 @@
                                         Panel Admin
                                     </a>
                                 @endif
-                                <a href="/orders"
-                                    class="block px-4 py-2 text-sm leading-5 text-text hover:bg-background transition duration-150 ease-in-out">
-                                    Mis pedidos
-                                </a>
                                 <div class="border-t border-border"></div>
                                 <form method="post" action="{{ route('logout') }}">
                                     @csrf
@@ -157,9 +153,7 @@
                             <a href="/favorites"
                                 class="block px-4 py-2 text-sm text-text hover:bg-background transition-colors">Mis
                                 favoritos</a>
-                            <a href="/orders"
-                                class="block px-4 py-2 text-sm text-text hover:bg-background transition-colors">Mis
-                                pedidos</a>
+
                             <div class="border-t border-border"></div>
                             @if (auth()->check())
                                 <form method="post" action="{{ route('logout') }}">
@@ -259,9 +253,6 @@
                     <div class="space-y-2 md:space-y-3">
                         <a href="/profile"
                             class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Mi perfil</a>
-                        <a href="/orders"
-                            class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Mis
-                            pedidos</a>
                         <a href="/favorites"
                             class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Mis
                             favoritos</a>

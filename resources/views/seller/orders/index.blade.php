@@ -14,7 +14,7 @@
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
             </svg>
             <p class="text-h5 font-oxanium font-semibold text-text mb-1">No hay pedidos todavía</p>
-            <p class="text-muted text-small">Cuando un cliente compre uno de tus productos, aparecerá acá.</p>
+            <p class="text-muted text-small">Todavía no recibiste pedidos — compartí tus productos para empezar a vender.</p>
         </div>
     @else
         <div class="space-y-4">
@@ -59,7 +59,22 @@
                             <tbody>
                                 @foreach($order->items as $item)
                                     <tr class="border-b border-border/50 last:border-b-0">
-                                        <td class="py-2 text-small text-text">{{ $item->product?->name ?? 'Producto eliminado' }}</td>
+                                        <td class="py-2">
+                                            <div class="flex items-center gap-3">
+                                                @if($item->product && $item->product->image)
+                                                    <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}"
+                                                        class="w-9 h-9 rounded-lg object-cover border border-border shrink-0">
+                                                @else
+                                                    <div class="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center text-muted shrink-0">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                            <rect x="4" y="4" width="16" height="16" rx="2" />
+                                                            <rect x="9" y="9" width="6" height="6" />
+                                                        </svg>
+                                                    </div>
+                                                @endif
+                                                <span class="text-small text-text">{{ $item->product?->name ?? 'Producto eliminado' }}</span>
+                                            </div>
+                                        </td>
                                         <td class="py-2 text-small text-muted">{{ $item->quantity }}</td>
                                         <td class="py-2 text-small text-muted">${{ number_format($item->price, 2) }}</td>
                                         <td class="py-2 text-small text-text font-medium">${{ number_format($item->price * $item->quantity, 2) }}</td>
@@ -69,9 +84,12 @@
                         </table>
                     </div>
 
+                    @php
+                        $sellerTotal = $order->items->sum(fn($i) => $i->price * $i->quantity);
+                    @endphp
                     <div class="mt-3 text-right">
                         <p class="text-small text-muted">
-                            Total del pedido: <span class="text-text font-semibold">${{ number_format($order->total, 2) }}</span>
+                            Total (tus productos): <span class="text-text font-semibold">${{ number_format($sellerTotal, 2) }}</span>
                         </p>
                     </div>
                 </div>
