@@ -9,11 +9,11 @@ use App\Models\Product;
 use App\Policies\ProductPolicy;
 use App\Services\CurrencyService;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,7 +24,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Product::class, ProductPolicy::class);
         Event::listen(Login::class, MergeGuestCart::class);
 
-        View::share('usdToArs', app(CurrencyService::class)->getRate());
+        View::composer('*', function (\Illuminate\View\View $view) {
+            $view->with('usdToArs', app(CurrencyService::class)->getRate());
+        });
 
         Paginator::defaultView('vendor.pagination.marketo');
     }
