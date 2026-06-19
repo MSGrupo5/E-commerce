@@ -44,6 +44,9 @@ Route::middleware('auth')->prefix('pedido')->name('checkout.')->group(function (
         ->whereIn('status', ['success', 'failure', 'pending']);
 });
 
+Route::post('/pedido/mercadopago/webhook', [CheckoutController::class, 'mpWebhook'])
+    ->name('checkout.mp.webhook');
+
 // ─── Perfil ──────────────────────────────────────────────────────────────────
 
 Route::middleware('auth')->group(function () {

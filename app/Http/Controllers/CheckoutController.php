@@ -120,4 +120,12 @@ class CheckoutController extends Controller
 
         return redirect()->route('home');
     }
+
+    public function mpWebhook(Request $request): \Illuminate\Http\Response
+    {
+        $mp = app(MercadoPagoService::class);
+        $mp->handleWebhook($request);
+
+        return response('OK', 200);
+    }
 }
