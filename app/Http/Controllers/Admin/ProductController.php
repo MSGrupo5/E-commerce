@@ -10,6 +10,7 @@ use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Models\user;
 
 class ProductController extends Controller
 {
@@ -21,6 +22,7 @@ class ProductController extends Controller
             ->when($request->filled('category_id'), function ($q) use ($request) {
                 $q->where('category_id', $request->category_id);
             })
+            ->when($request->filled('seller'), fn($q, $id) => $q->where('user_id', $id))
             ->latest()
             ->paginate(20);
 
