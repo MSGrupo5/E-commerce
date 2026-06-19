@@ -77,7 +77,7 @@ class CheckoutTest extends TestCase
         $response->assertOk();
         $response->assertViewIs('pedido.index');
         $response->assertSee('Monitor Gamer');
-        $response->assertSee('Calle Falsa 123'); // Pre-completado en textarea
+        $response->assertSee('Calle Falsa 123'); // Pre-completado
     }
 
     public function test_checkout_process_creates_order_and_clears_cart(): void
@@ -92,7 +92,7 @@ class CheckoutTest extends TestCase
         $response = $this->actingAs($this->user)
             ->post(route('checkout.store'), [
                 'shipping_address' => 'Nueva Direccion 456',
-                'payment_method' => 'efectivo',
+                'payment_method'   => 'efectivo',
             ]);
 
         $order = Order::where('user_id', $this->user->id)->first();
@@ -138,7 +138,7 @@ class CheckoutTest extends TestCase
             ->from(route('checkout.index'))
             ->post(route('checkout.store'), [
                 'shipping_address' => 'Calle Falsa 123',
-                'payment_method' => 'efectivo',
+                'payment_method'   => 'efectivo',
             ]);
 
         $response->assertRedirect(route('checkout.index'));
