@@ -64,6 +64,7 @@ resources/views/
 - **Tailwind theme**: custom colors `background:#0b0b0f`, `surface:#141419`, `border:#1e1e2a`, `primary:#6c63ff`, `accent:#00d4ff`, `text:#f1f5f9`, `muted:#94a3b8`
 - **Alpine.js**: Para interactividad cliente (modales, dropdowns, toggle password visibility)
 - **Idioma**: UI en español, hardcoded (sin archivos de traducción)
+- **Validación de imagen**: `nullable|image|mimes:jpeg,png,jpg,webp|max:2048` en todos los controllers con subida de imágenes (Seller, UserCatalog)
 
 ## Estado actual y pendientes conocidos
 
