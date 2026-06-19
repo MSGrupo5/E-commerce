@@ -37,6 +37,18 @@
             </div>
         </section>
 
+        {{-- Active seller banner --}}
+        @isset($activeSeller)
+            <div class="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 flex items-center justify-between">
+                <p class="text-sm text-text">
+                    Estás viendo los productos de <span class="font-semibold text-primary">{{ $activeSeller->name }}</span>
+                </p>
+                <a href="{{ route('products.index') }}" class="text-sm text-muted hover:text-text transition-colors shrink-0 ml-4">
+                    &times; Ver todos
+                </a>
+            </div>
+        @endisset
+
         {{-- Main layout: sidebar + product grid --}}
         <div class="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
             <aside class="hidden lg:block">
