@@ -40,8 +40,8 @@
         </div>
     @endif
 
-    <div class="rounded-3xl border border-border bg-surface overflow-hidden max-h-[600px]">
-        <div class="overflow-x-auto overflow-y-auto">
+    <div class="rounded-3xl border border-border bg-surface overflow-hidden">
+        <div class="overflow-x-auto">
             <table class="w-full text-left text-small">
                 <thead class="sticky top-0 z-10 bg-surface">
                     <tr class="border-b border-border text-muted text-[11px] uppercase tracking-[0.15em]">
@@ -123,5 +123,10 @@
 
     <div class="mt-6">
         {{ $users->withQueryString()->links() }}
+    </div>
+
+    <div class="mt-6 rounded-2xl border border-border bg-surface px-5 py-3 text-small text-muted flex flex-wrap items-center justify-between gap-2">
+        <span>&copy; {{ date('Y') }} NexusTech — Panel de Administración</span>
+        <span>Total de registros: <strong class="text-text">{{ $users->total() }}</strong></span>
     </div>
 @endsection

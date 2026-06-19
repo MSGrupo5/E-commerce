@@ -101,7 +101,7 @@
 
                             <x-slot name="content">
                                 <x-dropdown-link :href="route('profile.edit')" class="bg-surface text-text hover:bg-background">
-                                    {{ __('mi perfil') }}
+                                    {{ __('Mi Perfil') }}
                                 </x-dropdown-link>
                                 <a href="{{ route('seller.dashboard') }}"
                                     class="block px-4 py-2 text-sm leading-5 text-text hover:bg-background transition duration-150 ease-in-out">
@@ -119,7 +119,7 @@
                                     <x-dropdown-link :href="route('logout')"
                                         onclick="event.preventDefault(); this.closest('form').submit();"
                                         class="text-error hover:bg-error/10">
-                                        {{ __('cerrar sesión') }}
+                                        {{ __('Cerrar Sesión') }}
                                     </x-dropdown-link>
                                 </form>
                             </x-slot>

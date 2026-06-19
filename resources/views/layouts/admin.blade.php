@@ -18,7 +18,7 @@
 </head>
 
 <body x-data="{ mobilemenuopen: false, currentuserrole: 'superadmin' }"
-    class="bg-background text-text font-jakarta text-body font-normal antialiased min-h-screen flex relative overflow-hidden">
+    class="bg-background text-text font-jakarta text-body font-normal antialiased h-screen flex relative overflow-hidden">
 
     <div x-show="mobilemenuopen" @click="mobilemenuopen = false"
         class="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden" x-cloak></div>
@@ -184,7 +184,7 @@
             </div>
         </header>
 
-        <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 lg:p-6 bg-background">
+        <main class="flex-1 min-h-0 overflow-x-hidden overflow-y-auto px-4 lg:px-6 pt-4 lg:pt-6 pb-12 bg-background">
             <div class="max-w-[1440px] mx-auto w-full">
                 @yield('content')
             </div>
