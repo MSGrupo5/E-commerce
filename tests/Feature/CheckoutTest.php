@@ -95,7 +95,10 @@ class CheckoutTest extends TestCase
                 'direccion_entrega' => 'Nueva Direccion 456',
             ]);
 
-        $response->assertRedirect(route('products.index'));
+        $order = Order::where('user_id', $this->user->id)->first();
+        $this->assertNotNull($order);
+
+        $response->assertRedirect(route('checkout.confirmation', $order));
         $response->assertSessionHas('success');
 
         // Verificar DB
@@ -108,9 +111,6 @@ class CheckoutTest extends TestCase
             'status' => 'pending',
             'shipping_address' => 'Nueva Direccion 456',
         ]);
-
-        $order = Order::where('user_id', $this->user->id)->first();
-        $this->assertNotNull($order);
 
         $this->assertDatabaseHas('order_items', [
             'order_id' => $order->id,
@@ -155,5 +155,36 @@ class CheckoutTest extends TestCase
         // Stock sin cambiar
         $this->product->refresh();
         $this->assertSame(10, $this->product->stock);
+    }
+
+    public function test_user_can_view_own_checkout_confirmation(): void
+    {
+        $order = Order::create([
+            'user_id' => $this->user->id,
+            'total' => 150000.00,
+            'status' => 'pending',
+            'shipping_address' => 'Calle Falsa 123',
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('checkout.confirmation', $order));
+
+        $response->assertOk();
+        $response->assertViewIs('checkout.confirmation');
+        $response->assertSee('¡Pedido confirmado!');
+    }
+
+    public function test_user_cannot_view_others_checkout_confirmation(): void
+    {
+        $otherUser = User::factory()->create(['role' => 'cliente']);
+        $order = Order::create([
+            'user_id' => $otherUser->id,
+            'total' => 150000.00,
+            'status' => 'pending',
+            'shipping_address' => 'Calle Falsa 123',
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('checkout.confirmation', $order));
+
+        $response->assertStatus(403);
     }
 }
