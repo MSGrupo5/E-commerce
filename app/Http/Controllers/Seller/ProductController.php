@@ -96,11 +96,15 @@ class ProductController extends Controller
     {
         $this->authorize('delete', $product);
 
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
+        if ($product->orderItems()->exists()) {
+            $product->delete();
+        } else {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
 
-        $product->delete();
+            $product->forceDelete();
+        }
 
         return redirect()->route('seller.productos.index')
             ->with('success', 'Producto eliminado correctamente.');
