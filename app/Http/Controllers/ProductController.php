@@ -30,6 +30,8 @@ class ProductController extends Controller
             abort(404);
         }
 
+        $product->load(['seller', 'category']);
+
         return view('products.show', compact('product'));
     }
 
