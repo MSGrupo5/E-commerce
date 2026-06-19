@@ -161,6 +161,7 @@ class CheckoutTest extends TestCase
             'total' => 150000.00,
             'status' => 'pending',
             'shipping_address' => 'Calle Falsa 123',
+            'payment_method' => 'efectivo',
         ]);
 
         $response = $this->actingAs($this->user)->get(route('checkout.confirmacion', $order));
@@ -178,6 +179,7 @@ class CheckoutTest extends TestCase
             'total' => 150000.00,
             'status' => 'pending',
             'shipping_address' => 'Calle Falsa 123',
+            'payment_method' => 'efectivo',
         ]);
 
         $response = $this->actingAs($this->user)->get(route('checkout.confirmacion', $order));
