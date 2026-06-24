@@ -13,8 +13,10 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="antialiased bg-[#09090B] text-[#F1F5F9] min-h-screen flex flex-col justify-center items-center p-4 selection:bg-[#6C63FF]/30">
-        
+    <body class="antialiased bg-background text-text min-h-screen flex flex-col justify-center items-center p-4 selection:bg-primary/30">
+
+        <x-ui.loader />
+
         <div class="w-full flex justify-center items-center">
             {{ $slot }}
         </div>
