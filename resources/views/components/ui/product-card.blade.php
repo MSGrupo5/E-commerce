@@ -12,8 +12,8 @@
         : null;
 @endphp
 
-<div class="w-full max-w-full sm:max-w-[260px] rounded-[32px] border border-border bg-surface shadow-[0_24px_64px_rgba(0,0,0,0.25)] overflow-hidden transition-all duration-300 hover:border-primary/40 hover:-translate-y-0.5">
-    <div class="relative overflow-hidden bg-background">
+<div class="w-full max-w-full sm:max-w-[260px] h-full flex flex-col rounded-[32px] border border-border bg-surface shadow-[0_24px_64px_rgba(0,0,0,0.25)] overflow-hidden transition-all duration-300 hover:border-primary/40 hover:-translate-y-0.5">
+    <div class="relative overflow-hidden bg-background shrink-0">
         <a href="{{ Route::has('products.show') ? route('products.show', $product) : url('/products/'.$product->id) }}" class="block h-[170px] sm:h-[180px]">
             <div class="absolute inset-0 bg-gradient-to-b from-[#11121a]/40 to-transparent pointer-events-none"></div>
             <img src="{{ $image }}" alt="{{ $product->name }}" class="w-full h-full object-contain object-center transition-transform duration-500 hover:scale-105" onerror="this.style.display='none'" />
@@ -53,60 +53,65 @@
         </div>
     </div>
 
-    <div class="space-y-4 p-4 sm:p-5">
+    <div class="flex flex-1 flex-col gap-4 p-4 sm:p-5">
         <div class="space-y-2">
-            <p class="inline-flex rounded-full border border-border bg-background/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
+            <p class="inline-flex max-w-full truncate rounded-full border border-border bg-background/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
                 {{ $categoryName }}
             </p>
-            <a href="{{ Route::has('products.show') ? route('products.show', $product) : url('/products/'.$product->id) }}" class="block text-base font-semibold text-text leading-snug hover:text-primary transition-colors">
+            <a href="{{ Route::has('products.show') ? route('products.show', $product) : url('/products/'.$product->id) }}" class="block h-11 text-base font-semibold text-text leading-snug line-clamp-2 hover:text-primary transition-colors">
                 {{ $product->name }}
             </a>
             @if($product->relationLoaded('seller') && $product->seller)
-                <p class="text-xs text-muted mt-1">
+                <p class="truncate text-xs text-muted mt-1">
                     por
                     <a href="{{ route('products.index', ['seller' => $product->seller->id]) }}" class="text-text/70 font-medium hover:text-primary transition-colors">
                         {{ $product->seller->name }}
                     </a>
                 </p>
             @endif
+            <p class="h-8 text-xs leading-snug text-muted/80 line-clamp-2">
+                {{ $product->description ?? 'Sin descripción disponible.' }}
+            </p>
         </div>
 
-        <div class="flex items-center justify-between gap-3">
-            <div class="space-y-0.5">
-                <div class="flex items-end gap-2">
-                    <span class="text-xl font-bold text-primary">${{ number_format($product->price, 0, ',', '.') }}</span>
-                    @if($originalPrice)
-                        <span class="text-sm text-muted line-through">${{ number_format($originalPrice, 0, ',', '.') }}</span>
+        <div class="mt-auto space-y-4">
+            <div class="flex items-center justify-between gap-3">
+                <div class="space-y-0.5">
+                    <div class="flex items-end gap-2">
+                        <span class="text-xl font-bold text-primary">${{ number_format($product->price, 0, ',', '.') }}</span>
+                        @if($originalPrice)
+                            <span class="text-sm text-muted line-through">${{ number_format($originalPrice, 0, ',', '.') }}</span>
+                        @endif
+                    </div>
+                    @if($priceUsd)
+                        <p class="text-[11px] text-muted/70">≈ USD {{ $priceUsd }}</p>
                     @endif
+                    <p class="text-xs text-muted">
+                        {{ $isOutOfStock ? 'Agotado' : 'En stock' }}
+                    </p>
                 </div>
-                @if($priceUsd)
-                    <p class="text-[11px] text-muted/70">≈ USD {{ $priceUsd }}</p>
-                @endif
-                <p class="text-xs text-muted">
-                    {{ $isOutOfStock ? 'Agotado' : 'En stock' }}
-                </p>
             </div>
-        </div>
 
-        @if(!$isOutOfStock)
-            @if(Route::has('cart.add'))
-                <form action="{{ route('cart.add') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-background transition hover:bg-primary/90">
+            @if(!$isOutOfStock)
+                @if(Route::has('cart.add'))
+                    <form action="{{ route('cart.add') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-background transition hover:bg-primary/90">
+                            Agregar al carrito
+                        </button>
+                    </form>
+                @else
+                    <button type="button" class="w-full rounded-2xl bg-primary/30 px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
                         Agregar al carrito
                     </button>
-                </form>
+                @endif
             @else
-                <button type="button" class="w-full rounded-2xl bg-primary/30 px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
-                    Agregar al carrito
+                <button disabled class="w-full rounded-2xl bg-border px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
+                    Sin stock
                 </button>
             @endif
-        @else
-            <button disabled class="w-full rounded-2xl bg-border px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
-                Sin stock
-            </button>
-        @endif
+        </div>
     </div>
 </div>
