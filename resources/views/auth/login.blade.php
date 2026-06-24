@@ -2,8 +2,8 @@
     <div class="w-full mx-auto" style="max-width: 440px;">
 
         <div class="flex flex-col items-center mb-8">
-            <a href="{{ route('home') }}" class="mb-6">
-                <x-app.logo />
+            <a href="{{ route('home') }}" class="mb-6 flex justify-center w-full">
+                <x-app.logo :large="true" />
             </a>
             <h1 class="text-h3 font-bold text-text text-center mb-1.5 font-oxanium">Bienvenido de vuelta</h1>
             <p class="text-muted text-h6 text-center font-jakarta">Iniciá sesión para continuar</p>

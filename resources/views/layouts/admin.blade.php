@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketo — Panel de Administración</title>
 
+    <link rel="icon" type="image/svg+xml" href="{{ Vite::asset('resources/images/marketo_icono_solo.svg') }}">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
