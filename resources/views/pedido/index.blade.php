@@ -29,6 +29,12 @@
                     </h2>
 
                     <div class="space-y-4">
+                        <div class="rounded-2xl border border-border bg-background p-4 space-y-1">
+                            <p class="text-xs font-semibold text-muted uppercase tracking-wider">Comprando como</p>
+                            <p class="text-sm font-medium text-text">{{ $user->name }} {{ $user->apellido }}</p>
+                            <p class="text-xs text-muted">{{ $user->email }}</p>
+                        </div>
+
                         <div>
                             <label for="shipping_address" class="block text-small font-medium text-text mb-1.5">
                                 Dirección completa
@@ -46,10 +52,39 @@
                             @enderror
                         </div>
 
-                        <div class="rounded-2xl border border-border bg-background p-4 space-y-1">
-                            <p class="text-xs font-semibold text-muted uppercase tracking-wider">Comprando como</p>
-                            <p class="text-sm font-medium text-text">{{ $user->name }} {{ $user->apellido }}</p>
-                            <p class="text-xs text-muted">{{ $user->email }}</p>
+                        <div>
+                            <label for="phone" class="block text-small font-medium text-text mb-1.5">
+                                Teléfono de contacto
+                            </label>
+                            <input
+                                id="phone"
+                                name="phone"
+                                type="tel"
+                                form="checkout-form"
+                                required
+                                placeholder="Ej: 11 2345-6789"
+                                value="{{ old('phone') }}"
+                                class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted">
+                            <p class="text-xs text-muted mt-1">Lo usamos para coordinar la entrega del pedido.</p>
+                            @error('phone')
+                                <p class="text-error text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="notes" class="block text-small font-medium text-text mb-1.5">
+                                Notas adicionales <span class="text-muted">(opcional)</span>
+                            </label>
+                            <textarea
+                                id="notes"
+                                name="notes"
+                                form="checkout-form"
+                                rows="2"
+                                placeholder="Ej: timbre roto, entregar en portería, horario preferido..."
+                                class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted resize-none">{{ old('notes') }}</textarea>
+                            @error('notes')
+                                <p class="text-error text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -156,19 +191,62 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
                         </svg>
                         <p class="text-xs text-warning/90 leading-relaxed">
-                            Al confirmar el pedido te enviaremos la dirección de wallet para realizar la transferencia en USDT (red TRC-20 o BEP-20).
+                            Al confirmar el pedido vas a ver la dirección de wallet para transferir en USDT. Una vez que pagues, vas a poder pegar el hash de la transacción como comprobante.
                         </p>
                     </div>
 
-                    {{-- Aviso contextual Tarjeta --}}
-                    <div x-show="metodo === 'tarjeta'" x-cloak x-transition
-                        class="mt-4 flex items-start gap-3 rounded-2xl border border-border bg-background/60 px-4 py-3.5">
-                        <svg class="w-4 h-4 text-muted shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
-                        </svg>
-                        <p class="text-xs text-muted leading-relaxed">
-                            Podrás pagar con tu tarjeta al momento de recibir el pedido o al retirar en el local.
-                        </p>
+                    {{-- Datos de la tarjeta --}}
+                    {{-- Nota: estos campos no tienen "name" a propósito — no se envían al servidor ni se
+                         almacenan, ya que esta tienda no procesa pagos con tarjeta de forma real todavía. --}}
+                    <div x-show="metodo === 'tarjeta'" x-cloak x-transition class="mt-4 space-y-4">
+                        <div>
+                            <label class="block text-small font-medium text-text mb-1.5">Número de tarjeta</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" maxlength="19" placeholder="1234 5678 9012 3456"
+                                class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted">
+                        </div>
+
+                        <div>
+                            <label class="block text-small font-medium text-text mb-1.5">Nombre del titular</label>
+                            <input type="text" autocomplete="off" placeholder="Como figura en la tarjeta"
+                                class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted">
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-small font-medium text-text mb-1.5">Vencimiento</label>
+                                <input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="MM/AA"
+                                    class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted">
+                            </div>
+                            <div>
+                                <label class="block text-small font-medium text-text mb-1.5">CVV</label>
+                                <input type="text" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="123"
+                                    class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted">
+                            </div>
+                            <div>
+                                <label class="block text-small font-medium text-text mb-1.5">DNI titular</label>
+                                <input type="text" inputmode="numeric" autocomplete="off" maxlength="9" placeholder="30123456"
+                                    class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-small font-medium text-text mb-1.5">Cuotas</label>
+                            <select class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors">
+                                <option>1 cuota sin interés</option>
+                                <option>3 cuotas sin interés</option>
+                                <option>6 cuotas con interés</option>
+                                <option>12 cuotas con interés</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-start gap-3 rounded-2xl border border-border bg-background/60 px-4 py-3.5">
+                            <svg class="w-4 h-4 text-muted shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
+                            </svg>
+                            <p class="text-xs text-muted leading-relaxed">
+                                Pago seguro procesado al confirmar el pedido.
+                            </p>
+                        </div>
                     </div>
 
                 </div>
@@ -212,7 +290,11 @@
                         @endforeach
                     </ul>
 
-                    <div class="border-t border-border pt-4">
+                    <div class="border-t border-border pt-4 space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-muted">Envío</span>
+                            <span class="text-text font-medium">A coordinar con el vendedor</span>
+                        </div>
                         <div class="flex items-end justify-between gap-2">
                             <span class="text-sm text-muted">Total</span>
                             <div class="text-right">
@@ -226,6 +308,16 @@
                                 @endif
                             </div>
                         </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 rounded-2xl border border-border bg-background/60 px-4 py-3.5">
+                        <svg class="w-4 h-4 text-muted shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
+                        <p class="text-xs text-muted leading-relaxed">
+                            Tiempo estimado de entrega: <span class="text-text font-medium">3 a 5 días hábiles</span> luego de confirmado el pago.
+                        </p>
                     </div>
                 </div>
             </div>

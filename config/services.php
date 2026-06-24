@@ -40,4 +40,9 @@ return [
         'key'      => env('AZURE_CONTENT_SAFETY_KEY'),
     ],
 
+    'usdt' => [
+        'wallet_address' => env('USDT_WALLET_ADDRESS'),
+        'wallet_network' => env('USDT_WALLET_NETWORK', 'TRC-20'),
+    ],
+
 ];
