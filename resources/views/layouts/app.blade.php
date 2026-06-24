@@ -28,14 +28,13 @@
 
             {{-- Buscador (desktop) --}}
             <div class="hidden md:block flex-1 max-w-xl">
-                <form action="{{ route('products.index') }}" method="get"
-                    class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-background border border-border focus-within:border-primary/50 transition-colors">
-                    <svg class="w-4 h-4 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <form action="{{ route('products.index') }}" method="get" class="relative">
+                    <svg class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z" />
                     </svg>
                     <input type="text" name="search" value="{{ request('search') }}"
                         placeholder="Buscar productos, vendedores..."
-                        class="bg-transparent text-sm outline-none w-full text-text placeholder-muted">
+                        class="w-full rounded-2xl border border-border bg-background pl-10 pr-4 py-2.5 text-sm text-text placeholder-muted outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20">
                 </form>
             </div>
 
@@ -179,7 +178,7 @@
         {{-- Buscador mobile --}}
         <div class="block md:hidden px-4 pb-3">
             <form action="{{ route('products.index') }}" method="get"
-                class="flex items-center gap-2 px-3 py-2 rounded-lg bg-background border border-border">
+                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-background border border-border">
                 <svg class="w-3.5 h-3.5 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z" />
                 </svg>

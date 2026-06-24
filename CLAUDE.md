@@ -25,7 +25,7 @@ php artisan test --filter=ExampleTest
 
 # Migraciones y seeding
 php artisan migrate
-php artisan db:seed          # crea admin@nexustech.com (role=admin) + test@example.com
+php artisan db:seed          # crea admin@marketo.com (role=admin) + test@example.com
 
 # Compilar assets
 npm run build
@@ -50,21 +50,22 @@ Tres roles en `users.role`: `admin`, `usuario` (default al registrarse). Todos l
 |---|---|---|---|
 | `/` | — | `home`, `products.*` | Catálogo público |
 | `/carrito` | — (GET/POST público) | `cart.*` | Carrito (guest y auth) |
+| `/favoritos` | `auth` | `favorites.*` | Favoritos |
 | `/pedido` | `auth` | `checkout.*` | Checkout |
 | `/admin` | `auth`, `admin` | `admin.` | Panel admin |
 | `/panel` | `auth` | `seller.` | Panel vendedor |
 | `/profile` | `auth` | `profile.*` | Perfil de usuario |
 
-> **Nota:** `/carrito` GET y POST son públicos (guests pueden agregar al carrito). `/carrito/{cartItem}` PATCH y DELETE requieren auth.
+> **Nota:** `/carrito` GET y POST son públicos (guests pueden agregar al carrito). `/carrito/{cartItem}` PATCH y DELETE, y todo `/favoritos`, requieren auth.
 
 ### Controllers
 
 Tres namespaces:
-- `App\Http\Controllers\` — público: `ProductController`, `CartController`, `CheckoutController`
-- `App\Http\Controllers\Admin\` — `DashboardController`, `ProductController` (index + destroy únicamente), `UserController`
-- `App\Http\Controllers\Seller\` — `DashboardController`, `ProductController` (resource completo + `toggleActivo()`), `OrderController`
+- `App\Http\Controllers\` — público: `ProductController`, `CartController`, `CheckoutController`, `FavoriteController`
+- `App\Http\Controllers\Admin\` — `DashboardController`, `ProductController` (index + destroy únicamente), `UserController`, `CategoryController` (CRUD de categorías, sin destroy si la categoría tiene productos asociados)
+- `App\Http\Controllers\Seller\` — `DashboardController`, `ProductController` (resource completo + `toggleActivo()`), `OrderController` (ventas recibidas), `ComprasController` (compras hechas por el vendedor como comprador, vía `pedidos`/`compras`)
 
-`Seller\ProductController` usa `StoreProductRequest` y `UpdateProductRequest` en lugar de validación inline.
+`Seller\ProductController` usa `StoreProductRequest` y `UpdateProductRequest` en lugar de validación inline. Ambas requests aplican `App\Rules\SinContenidoOfensivo` a `name` y `description` (filtro de contenido ofensivo por tokens/frases en español rioplatense) y limitan `description` a 1000 caracteres.
 
 ### FormRequests (`app/Http/Requests/`)
 
@@ -75,6 +76,8 @@ Tres namespaces:
 | `AddToCartRequest` | `CartController::store()` — authorize: true (guests y auth) |
 | `UpdateCartRequest` | `CartController::update()` — authorize: auth check |
 | `ProcessCheckoutRequest` | `CheckoutController::store()` |
+
+`Admin\CategoryController` valida inline (`unique:categories,name`) en vez de usar FormRequests dedicados.
 
 ### Models & Relationships
 
@@ -90,9 +93,11 @@ Product ──belongsTo──> Category (tiene slug para filtrado de catálogo)
 
 Detalles clave de modelos:
 - `Product::seller()` y `Product::user()` apuntan al mismo `User` vía `user_id` — preferir `seller()` en vistas.
-- `Product::scopeSearch()` — busca en `name`, `description` y nombre del seller.
+- `Product::scopeSearch()` — busca solo en `name` (LIKE).
+- `Product` usa `SoftDeletes` — eliminar un producto no borra sus `OrderItem`/`CartItem` históricos.
 - `Product::is_active` — productos inactivos retornan 404 en `ProductController::show()`. Los vendedores pueden togglear con `Seller\ProductController::toggleActivo()`.
 - `Product::inStock()` — helper `stock > 0`.
+- `Product::imageUrl` (accessor) — si `image` ya es una URL absoluta (`http...`) la devuelve tal cual, sino la resuelve vía `asset('storage/...')`.
 - `Cart::getOrCreate(User $user)` — factory estático; usar siempre en lugar de `Cart::firstOrCreate()` directamente.
 - `User::apellido`, `User::direccion_entrega` — campos adicionales (no estándar de Breeze).
 
@@ -108,8 +113,15 @@ Estructura de sesión: `session('cart.items') = [['product_id' => int, 'quantity
 
 1. `/carrito` → usuario ve items y CTA "Finalizar compra" (auth) o "Iniciar sesión para comprar" (guest)
 2. `/pedido` — `CheckoutController::index()` muestra form con dirección de entrega
-3. POST `/pedido` — crea `Order` + `OrderItem`s, decrementa stock, vacía carrito
+3. POST `/pedido` — `CheckoutController::store()` envuelve en `DB::transaction()` la creación de `Order` + `OrderItem`s, el decremento de stock y el vaciado de carrito
 4. Redirige a `/pedido/{order}/confirmacion`
+
+### Servicios
+
+- `App\Services\CurrencyService` — cotiza ARS→USD contra `https://dolarapi.com/v1/dolares/blue` (campo `venta`), cacheado 1h (`Cache::remember`). Si la API falla o la tabla de cache no existe (p. ej. en CI sin `cache` table), usa el fallback hardcodeado `1200.0` en vez de romper. Se invoca en **cada request**: `AppServiceProvider::boot()` registra un `View::composer('*', ...)` que comparte la variable `usdToArs` (el rate de `getRate()`) a todas las vistas.
+- `App\Rules\SinContenidoOfensivo` — `ValidationRule` usado en `name`/`description` de productos; bloquea tokens y frases ofensivas (homofobia, racismo, ableísmo, xenofobia, vulgaridad rioplatense) con normalización de espacios para detectar variantes pegadas.
+
+`AppServiceProvider::boot()` también fija `Paginator::defaultView('vendor.pagination.marketo')` — la paginación en toda la app usa la vista custom `resources/views/vendor/pagination/marketo.blade.php` en vez del estilo Tailwind por defecto.
 
 ### Frontend Stack
 
