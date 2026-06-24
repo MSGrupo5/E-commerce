@@ -96,7 +96,11 @@
                 </div>
 
                 <div class="space-y-3">
-                    @if($product->stock > 0)
+                    @if(auth()->user()?->isAdmin())
+                        <div class="w-full rounded-2xl border border-border bg-background px-5 py-4 text-center text-sm text-muted">
+                            Los administradores no pueden agregar productos al carrito.
+                        </div>
+                    @elseif($product->stock > 0)
                         <form action="{{ route('cart.add') }}" method="POST">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $product->id }}">

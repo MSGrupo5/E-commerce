@@ -29,6 +29,10 @@ class CartController extends Controller
 
     public function store(AddToCartRequest $request): RedirectResponse
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            return back()->with('error', 'Los administradores no pueden agregar productos al carrito.');
+        }
+
         $product = Product::findOrFail($request->product_id);
         $quantity = $request->quantity;
 

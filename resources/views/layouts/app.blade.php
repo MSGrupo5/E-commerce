@@ -104,9 +104,11 @@
                                 <x-dropdown-link :href="route('favorites.index')" class="text-text hover:bg-background hover:text-primary">
                                     Mis favoritos
                                 </x-dropdown-link>
-                                <x-dropdown-link :href="route('seller.dashboard')" class="text-text hover:bg-background hover:text-primary">
-                                    Panel de vendedor
-                                </x-dropdown-link>
+                                @unless(auth()->user()->isAdmin())
+                                    <x-dropdown-link :href="route('seller.dashboard')" class="text-text hover:bg-background hover:text-primary">
+                                        Panel de vendedor
+                                    </x-dropdown-link>
+                                @endunless
                                 @if(auth()->user()->isAdmin())
                                     <x-dropdown-link :href="route('admin.dashboard')" class="text-text hover:bg-background hover:text-primary">
                                         Panel de administración
@@ -156,7 +158,9 @@
                                 @endif
                             </a>
                             @auth
-                                <a href="{{ route('seller.dashboard') }}" class="block px-4 py-2 text-sm text-text hover:bg-background">Panel de vendedor</a>
+                                @unless(auth()->user()->isAdmin())
+                                    <a href="{{ route('seller.dashboard') }}" class="block px-4 py-2 text-sm text-text hover:bg-background">Panel de vendedor</a>
+                                @endunless
                                 <a href="{{ route('favorites.index') }}" class="block px-4 py-2 text-sm text-text hover:bg-background">Mis favoritos</a>
                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-text hover:bg-background">Mi perfil</a>
                                 <div class="border-t border-border"></div>
@@ -212,6 +216,27 @@
         </div>
     @endif
 
+    {{-- ─── Toast de error ─────────────────────────────────────────── --}}
+    @if(session('error'))
+        <div x-data="{ show: true }" x-show="show" x-cloak
+            x-init="setTimeout(() => show = false, 4500)"
+            class="fixed top-20 right-4 z-[100] max-w-sm w-full rounded-2xl border border-error/30 bg-surface px-5 py-4 shadow-2xl">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-error/20">
+                    <svg class="h-5 w-5 text-error" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                </div>
+                <p class="text-sm text-text font-medium flex-1">{{ session('error') }}</p>
+                <button type="button" @click="show = false" class="ml-auto text-muted hover:text-text transition-colors">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
     <x-ui.loader />
 
     {{-- ─── Contenido principal ────────────────────────────────────── --}}
@@ -247,8 +272,10 @@
                 <div>
                     <p class="text-text text-[13px] font-semibold mb-4 tracking-wider uppercase">Vender</p>
                     <div class="space-y-2 md:space-y-3">
-                        <a href="{{ route('seller.dashboard') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Panel de vendedor</a>
-                        <a href="{{ route('seller.productos.create') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Publicar producto</a>
+                        @unless(auth()->user()?->isAdmin())
+                            <a href="{{ route('seller.dashboard') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Panel de vendedor</a>
+                            <a href="{{ route('seller.productos.create') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Publicar producto</a>
+                        @endunless
                         <a href="{{ route('register') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Registrarse como vendedor</a>
                     </div>
                 </div>
