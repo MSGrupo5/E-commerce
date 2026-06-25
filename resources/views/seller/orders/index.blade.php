@@ -84,6 +84,7 @@
                     <div class="mt-3 flex items-center justify-between">
                         <div>
                             @if($order->isPending())
+                                @if(Route::has('seller.orders.status'))
                                 <div class="flex items-center gap-2">
                                     <form action="{{ route('seller.orders.status', $order) }}" method="POST">
                                         @csrf
@@ -111,6 +112,7 @@
                                         </button>
                                     </form>
                                 </div>
+                                @endif
                             @elseif($order->isPaid())
                                 <span class="text-xs text-muted">Pedido completado</span>
                             @elseif($order->isCancelled())
