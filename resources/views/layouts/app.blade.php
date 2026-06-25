@@ -30,14 +30,35 @@
             </a>
 
             {{-- Buscador (desktop) --}}
-            <div class="hidden md:block flex-1 max-w-xl">
-                <form action="{{ route('products.index') }}" method="get" class="relative">
+            <div class="hidden md:block flex-1 max-w-xl"
+                x-data="searchSuggest('{{ route('products.suggestions') }}', '{{ request('search') }}')"
+                @click.outside="close()">
+                <form action="{{ route('products.index') }}" method="get" class="relative" autocomplete="off" @submit="close()">
                     <svg class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z" />
                     </svg>
-                    <input type="text" name="search" value="{{ request('search') }}"
+                    <input type="text" name="search" x-model="query"
+                        @input="search()"
+                        @keydown.down.prevent="move(1)"
+                        @keydown.up.prevent="move(-1)"
+                        @keydown.enter="if (highlighted >= 0) { $event.preventDefault(); chooseHighlighted(); }"
+                        @keydown.escape="close()"
+                        @focus="show = suggestions.length > 0"
                         placeholder="Buscar productos, vendedores..."
                         class="w-full rounded-2xl border border-border bg-background pl-10 pr-4 py-2.5 text-sm text-text placeholder-muted outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20">
+
+                    <div x-show="show" x-cloak x-transition.opacity.duration.100ms
+                        class="absolute left-0 right-0 top-full mt-2 z-50 max-h-96 overflow-y-auto rounded-2xl border border-border bg-surface shadow-2xl">
+                        <template x-for="(item, index) in suggestions" :key="item.id">
+                            <a :href="item.url"
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors"
+                                :class="highlighted === index ? 'bg-primary/10 text-primary' : 'text-text hover:bg-background'">
+                                <img :src="item.image_url" alt="" class="h-8 w-8 rounded-lg object-cover border border-border shrink-0" onerror="this.style.display='none'">
+                                <span class="flex-1 truncate" x-text="item.name"></span>
+                                <span class="text-xs text-muted shrink-0" x-text="'$' + item.price_formatted"></span>
+                            </a>
+                        </template>
+                    </div>
                 </form>
             </div>
 
@@ -104,9 +125,11 @@
                                 <x-dropdown-link :href="route('favorites.index')" class="text-text hover:bg-background hover:text-primary">
                                     Mis favoritos
                                 </x-dropdown-link>
-                                <x-dropdown-link :href="route('seller.dashboard')" class="text-text hover:bg-background hover:text-primary">
-                                    Panel de vendedor
-                                </x-dropdown-link>
+                                @unless(auth()->user()->isAdmin())
+                                    <x-dropdown-link :href="route('seller.dashboard')" class="text-text hover:bg-background hover:text-primary">
+                                        Panel de vendedor
+                                    </x-dropdown-link>
+                                @endunless
                                 @if(auth()->user()->isAdmin())
                                     <x-dropdown-link :href="route('admin.dashboard')" class="text-text hover:bg-background hover:text-primary">
                                         Panel de administración
@@ -156,7 +179,9 @@
                                 @endif
                             </a>
                             @auth
-                                <a href="{{ route('seller.dashboard') }}" class="block px-4 py-2 text-sm text-text hover:bg-background">Panel de vendedor</a>
+                                @unless(auth()->user()->isAdmin())
+                                    <a href="{{ route('seller.dashboard') }}" class="block px-4 py-2 text-sm text-text hover:bg-background">Panel de vendedor</a>
+                                @endunless
                                 <a href="{{ route('favorites.index') }}" class="block px-4 py-2 text-sm text-text hover:bg-background">Mis favoritos</a>
                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-text hover:bg-background">Mi perfil</a>
                                 <div class="border-t border-border"></div>
@@ -179,14 +204,35 @@
         </div>
 
         {{-- Buscador mobile --}}
-        <div class="block md:hidden px-4 pb-3">
-            <form action="{{ route('products.index') }}" method="get" class="relative">
+        <div class="block md:hidden px-4 pb-3"
+            x-data="searchSuggest('{{ route('products.suggestions') }}', '{{ request('search') }}')"
+            @click.outside="close()">
+            <form action="{{ route('products.index') }}" method="get" class="relative" autocomplete="off" @submit="close()">
                 <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z" />
                 </svg>
-                <input type="text" name="search" value="{{ request('search') }}"
+                <input type="text" name="search" x-model="query"
+                    @input="search()"
+                    @keydown.down.prevent="move(1)"
+                    @keydown.up.prevent="move(-1)"
+                    @keydown.enter="if (highlighted >= 0) { $event.preventDefault(); chooseHighlighted(); }"
+                    @keydown.escape="close()"
+                    @focus="show = suggestions.length > 0"
                     placeholder="Buscar productos..."
                     class="w-full rounded-2xl border border-border bg-background pl-9 pr-3 py-2 text-sm text-text placeholder-muted outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20">
+
+                <div x-show="show" x-cloak x-transition.opacity.duration.100ms
+                    class="absolute left-0 right-0 top-full mt-2 z-50 max-h-80 overflow-y-auto rounded-2xl border border-border bg-surface shadow-2xl">
+                    <template x-for="(item, index) in suggestions" :key="item.id">
+                        <a :href="item.url"
+                            class="flex items-center gap-3 px-3 py-2 text-sm transition-colors"
+                            :class="highlighted === index ? 'bg-primary/10 text-primary' : 'text-text hover:bg-background'">
+                            <img :src="item.image_url" alt="" class="h-7 w-7 rounded-lg object-cover border border-border shrink-0" onerror="this.style.display='none'">
+                            <span class="flex-1 truncate" x-text="item.name"></span>
+                            <span class="text-xs text-muted shrink-0" x-text="'$' + item.price_formatted"></span>
+                        </a>
+                    </template>
+                </div>
             </form>
         </div>
     </header>
@@ -203,6 +249,27 @@
                     </svg>
                 </div>
                 <p class="text-sm text-text font-medium flex-1">{{ session('cart_success') }}</p>
+                <button type="button" @click="show = false" class="ml-auto text-muted hover:text-text transition-colors">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
+    {{-- ─── Toast de error ─────────────────────────────────────────── --}}
+    @if(session('error'))
+        <div x-data="{ show: true }" x-show="show" x-cloak
+            x-init="setTimeout(() => show = false, 4500)"
+            class="fixed top-20 right-4 z-[100] max-w-sm w-full rounded-2xl border border-error/30 bg-surface px-5 py-4 shadow-2xl">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-error/20">
+                    <svg class="h-5 w-5 text-error" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                </div>
+                <p class="text-sm text-text font-medium flex-1">{{ session('error') }}</p>
                 <button type="button" @click="show = false" class="ml-auto text-muted hover:text-text transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -247,8 +314,10 @@
                 <div>
                     <p class="text-text text-[13px] font-semibold mb-4 tracking-wider uppercase">Vender</p>
                     <div class="space-y-2 md:space-y-3">
-                        <a href="{{ route('seller.dashboard') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Panel de vendedor</a>
-                        <a href="{{ route('seller.productos.create') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Publicar producto</a>
+                        @unless(auth()->user()?->isAdmin())
+                            <a href="{{ route('seller.dashboard') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Panel de vendedor</a>
+                            <a href="{{ route('seller.productos.create') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Publicar producto</a>
+                        @endunless
                         <a href="{{ route('register') }}" class="block text-xs md:text-sm text-muted hover:text-text transition-colors">Registrarse como vendedor</a>
                     </div>
                 </div>
