@@ -22,10 +22,9 @@ class ProductController extends Controller
             ->when($request->filled('category_id'), function ($q) use ($request) {
                 $q->where('category_id', $request->category_id);
             })
-            ->when(
-                $request->filled('seller'),
-                fn ($q, $id) => $q->where('user_id', $id)
-            )
+            ->when($request->filled('seller'), function ($q) use ($request) {
+                $q->where('user_id', $request->seller);
+            })
             ->latest()
             ->paginate(20);
 
