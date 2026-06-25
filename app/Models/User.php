@@ -78,6 +78,15 @@ class User extends Authenticatable
         return $this->role === 'usuario';
     }
 
+    /**
+     * Ruta a la que se redirige a este usuario tras login/verificación cuando no
+     * hay una URL "intended" previa. Los admins van a su panel; el resto, al catálogo.
+     */
+    public function defaultRedirectRoute(): string
+    {
+        return $this->isAdmin() ? route('admin.dashboard') : route('products.index');
+    }
+
     // --- Helpers de ubicación ---
 
     /**
