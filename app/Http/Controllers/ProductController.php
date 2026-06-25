@@ -41,6 +41,29 @@ class ProductController extends Controller
         return view('products.show', compact('product', 'isFavorite'));
     }
 
+    public function suggestions(Request $request)
+    {
+        $query = trim((string) $request->input('search', ''));
+
+        if (mb_strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::where('is_active', true)
+            ->search($query)
+            ->orderBy('name')
+            ->limit(6)
+            ->get(['id', 'name', 'price', 'image']);
+
+        return response()->json($products->map(fn (Product $product) => [
+            'id' => $product->id,
+            'name' => $product->name,
+            'price_formatted' => number_format($product->price, 0, ',', '.'),
+            'image_url' => $product->image_url,
+            'url' => route('products.show', $product),
+        ]));
+    }
+
     public function search(Request $request)
     {
         $query = $request->input('search');

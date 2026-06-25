@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
+Route::get('/productos/sugerencias', [ProductController::class, 'suggestions'])->name('products.suggestions');
 Route::get('/productos/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
 
@@ -34,7 +35,7 @@ Route::middleware('auth')->group(function () {
 
 // ─── Checkout (requiere autenticación) ──────────────────────────────────────
 
-Route::middleware('auth')->prefix('pedido')->name('checkout.')->group(function () {
+Route::middleware(['auth', 'redirect.if.admin'])->prefix('pedido')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/', [CheckoutController::class, 'store'])->name('store');
     Route::get('/{order}/confirmacion', [CheckoutController::class, 'confirmacion'])->name('confirmacion');
@@ -52,7 +53,7 @@ Route::middleware('auth')->group(function () {
 // ─── Panel vendedor ──────────────────────────────────────────────────────────
 
 Route::prefix('panel')
-    ->middleware('auth')
+    ->middleware(['auth', 'redirect.if.admin'])
     ->name('seller.')
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

@@ -99,7 +99,10 @@ Detalles clave de modelos:
 - `Product::inStock()` — helper `stock > 0`.
 - `Product::imageUrl` (accessor) — si `image` ya es una URL absoluta (`http...`) la devuelve tal cual, sino la resuelve vía `asset('storage/...')`.
 - `Cart::getOrCreate(User $user)` — factory estático; usar siempre en lugar de `Cart::firstOrCreate()` directamente.
-- `User::apellido`, `User::direccion_entrega` — campos adicionales (no estándar de Breeze).
+- `Cart::efectivoDisponiblePara(User $buyer)` — el pago en efectivo requiere coordinar un punto de encuentro, así que solo está disponible si el comprador y todos los vendedores del carrito comparten `provincia` y `ciudad` (comparación normalizada vía `User::livesInSameLocationAs()`). Se valida tanto en `CheckoutController::index()` (para deshabilitar la opción en la UI) como en `ProcessCheckoutRequest` (server-side).
+- `User::apellido`, `User::info_entrega`, `User::provincia`, `User::ciudad` — campos adicionales (no estándar de Breeze). `provincia` usa la constante `User::PROVINCIAS` (24 provincias argentinas) como lista cerrada.
+
+> **Nota histórica:** la columna se llamaba `direccion_entrega`; otra rama del equipo la renombró a `info_entrega` directamente en la base compartida sin commitear la migración. La migración `rename_direccion_entrega_to_info_entrega_and_add_location_to_users_table` es idempotente para reconciliar ambos estados.
 
 ### Guest Cart (Carrito de invitados)
 

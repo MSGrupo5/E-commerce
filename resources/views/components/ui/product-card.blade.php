@@ -92,26 +92,28 @@
                 </div>
             </div>
 
-            @if(!$isOutOfStock)
-                @if(Route::has('cart.add'))
-                    <form action="{{ route('cart.add') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <input type="hidden" name="quantity" value="1">
-                        <button type="submit" class="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-background transition hover:bg-primary/90">
+            @unless(auth()->user()?->isAdmin())
+                @if(!$isOutOfStock)
+                    @if(Route::has('cart.add'))
+                        <form action="{{ route('cart.add') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-background transition hover:bg-primary/90">
+                                Agregar al carrito
+                            </button>
+                        </form>
+                    @else
+                        <button type="button" class="w-full rounded-2xl bg-primary/30 px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
                             Agregar al carrito
                         </button>
-                    </form>
+                    @endif
                 @else
-                    <button type="button" class="w-full rounded-2xl bg-primary/30 px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
-                        Agregar al carrito
+                    <button disabled class="w-full rounded-2xl bg-border px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
+                        Sin stock
                     </button>
                 @endif
-            @else
-                <button disabled class="w-full rounded-2xl bg-border px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
-                    Sin stock
-                </button>
-            @endif
+            @endunless
         </div>
     </div>
 </div>
