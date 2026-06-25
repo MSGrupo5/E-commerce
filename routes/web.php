@@ -11,7 +11,7 @@ use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\OrderController;
 use Illuminate\Support\Facades\Route;
 
-// ─── Catálogo público ────────────────────────────────────────────────────────
+// ─── Catálogo público ──────────────────────────────────────────────────────
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
@@ -42,7 +42,7 @@ Route::middleware(['auth', 'redirect.if.admin'])->prefix('pedido')->name('checko
     Route::patch('/{order}/comprobante', [CheckoutController::class, 'comprobante'])->name('comprobante');
 });
 
-// ─── Perfil ──────────────────────────────────────────────────────────────────
+// ─── Perfil ──────────────────────────────────────────────────────────
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -50,7 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ─── Panel vendedor ──────────────────────────────────────────────────────────
+// ─── Panel vendedor ────────────────────────────────────────────────────────
 
 Route::prefix('panel')
     ->middleware(['auth', 'redirect.if.admin'])
@@ -62,6 +62,7 @@ Route::prefix('panel')
         Route::patch('productos/{product}/toggle-activo', [App\Http\Controllers\Seller\ProductController::class, 'toggleActivo'])
             ->name('productos.toggle-activo');
         Route::get('pedidos', [OrderController::class, 'index'])->name('orders');
+        Route::patch('pedidos/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
         Route::get('compras', [App\Http\Controllers\Seller\ComprasController::class, 'index'])->name('compras');
     });
 
