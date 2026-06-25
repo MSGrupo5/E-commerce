@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
 
 // ─── Checkout (requiere autenticación) ──────────────────────────────────────
 
-Route::middleware('auth')->prefix('pedido')->name('checkout.')->group(function () {
+Route::middleware(['auth', 'redirect.if.admin'])->prefix('pedido')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/', [CheckoutController::class, 'store'])->name('store');
     Route::get('/{order}/confirmacion', [CheckoutController::class, 'confirmacion'])->name('confirmacion');
@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
 // ─── Panel vendedor ──────────────────────────────────────────────────────────
 
 Route::prefix('panel')
-    ->middleware('auth')
+    ->middleware(['auth', 'redirect.if.admin'])
     ->name('seller.')
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
