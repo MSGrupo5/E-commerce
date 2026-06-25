@@ -6,10 +6,10 @@ namespace Tests\Feature;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use App\Models\Order;
-use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,13 +18,15 @@ class CheckoutTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private User $seller;
+
     private Product $product;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->user = User::factory()->create([
             'role' => 'cliente',
             'info_entrega' => 'Calle Falsa 123',
@@ -38,7 +40,7 @@ class CheckoutTest extends TestCase
             'provincia' => 'Buenos Aires',
             'ciudad' => 'La Plata',
         ]);
-        
+
         $category = Category::create([
             'name' => 'Monitores',
             'slug' => 'monitores',
@@ -96,8 +98,8 @@ class CheckoutTest extends TestCase
         $response = $this->actingAs($this->user)
             ->post(route('checkout.store'), [
                 'shipping_address' => 'Nueva Direccion 456',
-                'phone'            => '11 2345-6789',
-                'payment_method'   => 'efectivo',
+                'phone' => '11 2345-6789',
+                'payment_method' => 'efectivo',
             ]);
 
         $order = Order::where('user_id', $this->user->id)->first();
@@ -144,8 +146,8 @@ class CheckoutTest extends TestCase
             ->from(route('checkout.index'))
             ->post(route('checkout.store'), [
                 'shipping_address' => 'Calle Falsa 123',
-                'phone'            => '11 2345-6789',
-                'payment_method'   => 'efectivo',
+                'phone' => '11 2345-6789',
+                'payment_method' => 'efectivo',
             ]);
 
         $response->assertRedirect(route('checkout.index'));
@@ -297,8 +299,8 @@ class CheckoutTest extends TestCase
         $response = $this->actingAs($this->user)
             ->post(route('checkout.store'), [
                 'shipping_address' => 'Calle Falsa 123',
-                'phone'            => '11 2345-6789',
-                'payment_method'   => 'efectivo',
+                'phone' => '11 2345-6789',
+                'payment_method' => 'efectivo',
             ]);
 
         $response->assertSessionHasErrors(['payment_method']);
@@ -316,8 +318,8 @@ class CheckoutTest extends TestCase
         $response = $this->actingAs($this->user)
             ->post(route('checkout.store'), [
                 'shipping_address' => 'Calle Falsa 123',
-                'phone'            => '11 2345-6789',
-                'payment_method'   => 'efectivo',
+                'phone' => '11 2345-6789',
+                'payment_method' => 'efectivo',
             ]);
 
         $response->assertSessionDoesntHaveErrors();

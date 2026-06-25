@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -17,10 +16,12 @@ return new class extends Migration
     public function up(): void
     {
         if (Schema::hasColumn('users', 'direccion_entrega') && ! Schema::hasColumn('users', 'info_entrega')) {
-            DB::statement('ALTER TABLE users CHANGE direccion_entrega info_entrega VARCHAR(500) NULL');
+            Schema::table('users', function (Blueprint $table) {
+                $table->renameColumn('direccion_entrega', 'info_entrega');
+            });
         } elseif (! Schema::hasColumn('users', 'info_entrega')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->string('info_entrega', 500)->nullable()->after('apellido');
+                $table->string('info_entrega')->nullable()->after('apellido');
             });
         }
 
@@ -49,7 +50,9 @@ return new class extends Migration
         });
 
         if (Schema::hasColumn('users', 'info_entrega') && ! Schema::hasColumn('users', 'direccion_entrega')) {
-            DB::statement('ALTER TABLE users CHANGE info_entrega direccion_entrega VARCHAR(255) NULL');
+            Schema::table('users', function (Blueprint $table) {
+                $table->renameColumn('info_entrega', 'direccion_entrega');
+            });
         }
     }
 };

@@ -16,9 +16,9 @@ class ProcessCheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shipping_address'  => ['required', 'string', 'max:500'],
-            'phone'             => ['required', 'string', 'max:30', 'regex:/^[0-9+\-\s()]{6,30}$/'],
-            'payment_method'    => [
+            'shipping_address' => ['required', 'string', 'max:500'],
+            'phone' => ['required', 'string', 'max:30', 'regex:/^[0-9+\-\s()]{6,30}$/'],
+            'payment_method' => [
                 'required',
                 Rule::in(['efectivo', 'tarjeta', 'usdt']),
                 function (string $attribute, mixed $value, \Closure $fail) {
@@ -27,7 +27,7 @@ class ProcessCheckoutRequest extends FormRequest
                     }
                 },
             ],
-            'notes'             => ['nullable', 'string', 'max:500'],
+            'notes' => ['nullable', 'string', 'max:500'],
         ];
     }
 
@@ -42,9 +42,9 @@ class ProcessCheckoutRequest extends FormRequest
     {
         return [
             'shipping_address' => 'dirección de entrega',
-            'phone'            => 'teléfono de contacto',
-            'payment_method'   => 'método de pago',
-            'notes'            => 'notas adicionales',
+            'phone' => 'teléfono de contacto',
+            'payment_method' => 'método de pago',
+            'notes' => 'notas adicionales',
         ];
     }
 }

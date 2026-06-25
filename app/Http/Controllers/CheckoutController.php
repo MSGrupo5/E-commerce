@@ -8,8 +8,8 @@ use App\Http\Requests\ProcessCheckoutRequest;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -51,21 +51,21 @@ class CheckoutController extends Controller
 
         $order = DB::transaction(function () use ($cart, $request, $total) {
             $order = Order::create([
-                'user_id'          => auth()->id(),
-                'total'            => $total,
-                'status'           => 'pending',
+                'user_id' => auth()->id(),
+                'total' => $total,
+                'status' => 'pending',
                 'shipping_address' => $request->shipping_address,
-                'payment_method'   => $request->payment_method,
-                'phone'            => $request->phone,
-                'notes'            => $request->notes,
+                'payment_method' => $request->payment_method,
+                'phone' => $request->phone,
+                'notes' => $request->notes,
             ]);
 
             foreach ($cart->items as $item) {
                 OrderItem::create([
-                    'order_id'   => $order->id,
+                    'order_id' => $order->id,
                     'product_id' => $item->product_id,
-                    'quantity'   => $item->quantity,
-                    'price'      => $item->product->price,
+                    'quantity' => $item->quantity,
+                    'price' => $item->product->price,
                 ]);
 
                 $item->product->decrement('stock', $item->quantity);
