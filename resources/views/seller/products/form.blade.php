@@ -157,7 +157,8 @@
                             <span>Seleccionar archivo</span>
                             <input type="file" id="image" name="image" accept="image/*"
                                 class="sr-only"
-                                @change="preview = URL.createObjectURL($event.target.files[0])">
+                                @change="preview = URL.createObjectURL($event.target.files[0])"
+                                {{ !isset($product) ? 'required' : '' }}>
                         </label>
                         <span class="text-xs text-muted">PNG, JPG hasta 2MB</span>
                     </div>
