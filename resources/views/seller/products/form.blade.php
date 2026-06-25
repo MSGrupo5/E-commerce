@@ -157,8 +157,16 @@
                             <span>Seleccionar archivo</span>
                             <input type="file" id="image" name="image" accept="image/*"
                                 class="sr-only"
-                                @change="preview = URL.createObjectURL($event.target.files[0])"
-                                {{ !isset($product) ? 'required' : '' }}>
+                                @change="
+                                    const file = $event.target.files[0];
+                                    if (file && file.size > 2 * 1024 * 1024) {
+                                        $event.target.setCustomValidity('La imagen no debe superar los 2MB.');
+                                        $event.target.reportValidity();
+                                    } else {
+                                        $event.target.setCustomValidity('');
+                                        preview = file ? URL.createObjectURL(file) : null;
+                                    }
+                                ">
                         </label>
                         <span class="text-xs text-muted">PNG, JPG hasta 2MB</span>
                     </div>

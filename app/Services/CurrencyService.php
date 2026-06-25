@@ -17,6 +17,14 @@ class CurrencyService
 
     private const FALLBACK = 1200.0;
 
+    /**
+     * Memoización a nivel de instancia: el servicio se resuelve como singleton
+     * (ver AppServiceProvider), por lo que esto evita repetir la lectura de cache
+     * (una query a la tabla `cache` con CACHE_STORE=database) en cada vista/componente
+     * Blade renderizado durante el mismo request — antes se repetía decenas de veces.
+     */
+    private ?float $resolvedRate = null;
+
     public function arsToUsd(float $ars): float
     {
         return round($ars / $this->getRate(), 2);
@@ -24,8 +32,12 @@ class CurrencyService
 
     public function getRate(): float
     {
+        if ($this->resolvedRate !== null) {
+            return $this->resolvedRate;
+        }
+
         try {
-            return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+            return $this->resolvedRate = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
                 try {
                     $response = Http::timeout(5)->get(self::API_URL);
 
@@ -45,7 +57,7 @@ class CurrencyService
                 'cache_key' => self::CACHE_KEY,
             ]);
 
-            return self::FALLBACK;
+            return $this->resolvedRate = self::FALLBACK;
         }
     }
 }
