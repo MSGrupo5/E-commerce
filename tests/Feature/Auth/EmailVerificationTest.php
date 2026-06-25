@@ -38,6 +38,23 @@ class EmailVerificationTest extends TestCase
 
         Event::assertDispatched(Verified::class);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
+        $response->assertRedirect(route('products.index', absolute: false).'?verified=1');
+    }
+
+    public function test_admin_is_redirected_to_admin_dashboard_after_verifying_email(): void
+    {
+        $admin = User::factory()->unverified()->create(['role' => 'admin']);
+
+        Event::fake();
+
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $admin->id, 'hash' => sha1($admin->email)]
+        );
+
+        $response = $this->actingAs($admin)->get($verificationUrl);
+
         $response->assertRedirect(route('admin.dashboard', absolute: false).'?verified=1');
     }
 
