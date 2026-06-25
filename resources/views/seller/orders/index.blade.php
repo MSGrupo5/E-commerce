@@ -81,7 +81,42 @@
                     @php
                         $sellerTotal = $order->items->sum(fn($i) => $i->price * $i->quantity);
                     @endphp
-                    <div class="mt-3 text-right">
+                    <div class="mt-3 flex items-center justify-between">
+                        <div>
+                            @if($order->isPending())
+                                <div class="flex items-center gap-2">
+                                    <form action="{{ route('seller.orders.status', $order) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="paid">
+                                        <button type="submit"
+                                            class="inline-flex items-center gap-1.5 rounded-xl bg-success/10 px-4 py-2 text-[13px] font-semibold text-success transition hover:bg-success/20">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                            </svg>
+                                            Marcar como pagado
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('seller.orders.status', $order) }}" method="POST"
+                                        onsubmit="return confirm('¿Cancelar este pedido? Esta acción no se puede deshacer.')">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="cancelled">
+                                        <button type="submit"
+                                            class="inline-flex items-center gap-1.5 rounded-xl bg-error/10 px-4 py-2 text-[13px] font-semibold text-error transition hover:bg-error/20">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                            </svg>
+                                            Cancelar
+                                        </button>
+                                    </form>
+                                </div>
+                            @elseif($order->isPaid())
+                                <span class="text-xs text-muted">Pedido completado</span>
+                            @elseif($order->isCancelled())
+                                <span class="text-xs text-muted">Pedido cancelado</span>
+                            @endif
+                        </div>
                         <p class="text-small text-muted">
                             Total del pedido: <span class="text-text font-semibold">${{ number_format($order->total, 0, ',', '.') }}</span>
                         </p>
