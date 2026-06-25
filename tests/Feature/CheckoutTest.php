@@ -92,6 +92,7 @@ class CheckoutTest extends TestCase
         $response = $this->actingAs($this->user)
             ->post(route('checkout.store'), [
                 'shipping_address' => 'Nueva Direccion 456',
+                'phone'            => '11 2345-6789',
                 'payment_method'   => 'efectivo',
             ]);
 
@@ -106,6 +107,7 @@ class CheckoutTest extends TestCase
             'total' => 300000.00,
             'status' => 'pending',
             'shipping_address' => 'Nueva Direccion 456',
+            'phone' => '11 2345-6789',
         ]);
 
         $this->assertDatabaseHas('order_items', [
@@ -138,6 +140,7 @@ class CheckoutTest extends TestCase
             ->from(route('checkout.index'))
             ->post(route('checkout.store'), [
                 'shipping_address' => 'Calle Falsa 123',
+                'phone'            => '11 2345-6789',
                 'payment_method'   => 'efectivo',
             ]);
 
@@ -185,5 +188,60 @@ class CheckoutTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('checkout.confirmacion', $order));
 
         $response->assertStatus(403);
+    }
+
+    public function test_user_can_submit_usdt_tx_hash_for_own_order(): void
+    {
+        $order = Order::create([
+            'user_id' => $this->user->id,
+            'total' => 150000.00,
+            'status' => 'pending',
+            'shipping_address' => 'Calle Falsa 123',
+            'payment_method' => 'usdt',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->patch(route('checkout.comprobante', $order), ['usdt_tx_hash' => 'abc123hash']);
+
+        $response->assertRedirect(route('checkout.confirmacion', $order));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'usdt_tx_hash' => 'abc123hash',
+        ]);
+    }
+
+    public function test_user_cannot_submit_tx_hash_for_others_order(): void
+    {
+        $otherUser = User::factory()->create(['role' => 'cliente']);
+        $order = Order::create([
+            'user_id' => $otherUser->id,
+            'total' => 150000.00,
+            'status' => 'pending',
+            'shipping_address' => 'Calle Falsa 123',
+            'payment_method' => 'usdt',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->patch(route('checkout.comprobante', $order), ['usdt_tx_hash' => 'abc123hash']);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_cannot_submit_tx_hash_for_non_usdt_order(): void
+    {
+        $order = Order::create([
+            'user_id' => $this->user->id,
+            'total' => 150000.00,
+            'status' => 'pending',
+            'shipping_address' => 'Calle Falsa 123',
+            'payment_method' => 'efectivo',
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->patch(route('checkout.comprobante', $order), ['usdt_tx_hash' => 'abc123hash']);
+
+        $response->assertStatus(404);
     }
 }

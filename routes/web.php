@@ -38,6 +38,7 @@ Route::middleware('auth')->prefix('pedido')->name('checkout.')->group(function (
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/', [CheckoutController::class, 'store'])->name('store');
     Route::get('/{order}/confirmacion', [CheckoutController::class, 'confirmacion'])->name('confirmacion');
+    Route::patch('/{order}/comprobante', [CheckoutController::class, 'comprobante'])->name('comprobante');
 });
 
 // ─── Perfil ──────────────────────────────────────────────────────────────────

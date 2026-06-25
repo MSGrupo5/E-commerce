@@ -8,6 +8,7 @@ use App\Http\Requests\ProcessCheckoutRequest;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -54,6 +55,8 @@ class CheckoutController extends Controller
                 'status'           => 'pending',
                 'shipping_address' => $request->shipping_address,
                 'payment_method'   => $request->payment_method,
+                'phone'            => $request->phone,
+                'notes'            => $request->notes,
             ]);
 
             foreach ($cart->items as $item) {
@@ -85,5 +88,27 @@ class CheckoutController extends Controller
         $order->load('items.product');
 
         return view('pedido.confirmacion', compact('order'));
+    }
+
+    public function comprobante(Request $request, Order $order): RedirectResponse
+    {
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($order->payment_method !== 'usdt') {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'usdt_tx_hash' => ['required', 'string', 'max:255'],
+        ], [], [
+            'usdt_tx_hash' => 'hash de la transacción',
+        ]);
+
+        $order->update($validated);
+
+        return redirect()->route('checkout.confirmacion', $order)
+            ->with('success', 'Recibimos el comprobante. Verificaremos la transferencia a la brevedad.');
     }
 }

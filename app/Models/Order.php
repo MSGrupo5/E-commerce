@@ -17,6 +17,9 @@ class Order extends Model
         'status',
         'shipping_address',
         'payment_method',
+        'phone',
+        'notes',
+        'usdt_tx_hash',
     ];
 
     protected function casts(): array

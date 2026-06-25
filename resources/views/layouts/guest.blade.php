@@ -7,6 +7,9 @@
 
         <title>{{ config('app.name', 'TechStore') }}</title>
 
+        <link rel="icon" type="image/svg+xml" href="{{ Vite::asset('resources/images/marketo_icono_solo.svg') }}">
+        <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">

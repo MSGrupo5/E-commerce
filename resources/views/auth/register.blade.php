@@ -3,8 +3,8 @@
 
         {{-- Logo --}}
         <div class="flex flex-col items-center mb-8">
-            <a href="{{ route('home') }}" class="mb-6 focus:outline-none">
-                <x-app.logo />
+            <a href="{{ route('home') }}" class="mb-6 flex justify-center w-full focus:outline-none">
+                <x-app.logo :large="true" />
             </a>
             <h1 class="text-h3 font-bold text-text text-center mb-1.5 font-oxanium">Creá tu cuenta</h1>
             <p class="text-muted text-h6 text-center font-jakarta">Al registrarte podés comprar <strong class="text-text">y vender</strong> en Marketo</p>
