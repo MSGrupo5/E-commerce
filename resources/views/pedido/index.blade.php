@@ -46,7 +46,7 @@
                                 rows="3"
                                 required
                                 placeholder="Calle, número, piso, ciudad, provincia..."
-                                class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted resize-none">{{ old('shipping_address', $user->direccion_entrega) }}</textarea>
+                                class="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-text text-small focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder:text-muted resize-none">{{ old('shipping_address', $user->info_entrega) }}</textarea>
                             @error('shipping_address')
                                 <p class="text-error text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -91,7 +91,7 @@
 
                 {{-- Método de pago --}}
                 <div class="rounded-3xl border border-border bg-surface p-6 sm:p-8"
-                    x-data="{ metodo: '{{ old('payment_method', 'efectivo') }}' }">
+                    x-data="{ metodo: '{{ old('payment_method', $efectivoDisponible ? 'efectivo' : 'tarjeta') }}' }">
 
                     <h2 class="text-base font-semibold text-text mb-5 flex items-center gap-2">
                         <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">2</span>
@@ -109,9 +109,9 @@
                             :class="metodo === 'efectivo'
                                 ? 'border-primary bg-primary/5 shadow-[0_0_0_1px] shadow-primary/30'
                                 : 'border-border hover:border-primary/40 bg-background'"
-                            class="relative flex flex-col items-center gap-3 p-5 rounded-2xl border cursor-pointer transition-all">
+                            class="relative flex flex-col items-center gap-3 p-5 rounded-2xl border transition-all {{ $efectivoDisponible ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed' }}">
                             <input type="radio" name="payment_method" value="efectivo" form="checkout-form"
-                                x-model="metodo" class="sr-only">
+                                x-model="metodo" class="sr-only" @disabled(! $efectivoDisponible)>
                             <div :class="metodo === 'efectivo' ? 'text-primary' : 'text-muted'" class="transition-colors">
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"/>
@@ -120,7 +120,7 @@
                             <div class="text-center">
                                 <p :class="metodo === 'efectivo' ? 'text-primary' : 'text-text'"
                                     class="text-sm font-semibold transition-colors">Efectivo</p>
-                                <p class="text-xs text-muted mt-0.5">Al recibir el pedido</p>
+                                <p class="text-xs text-muted mt-0.5">{{ $efectivoDisponible ? 'Al recibir el pedido' : 'No disponible' }}</p>
                             </div>
                             <div x-show="metodo === 'efectivo'" x-cloak
                                 class="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
@@ -183,6 +183,21 @@
                         </label>
 
                     </div>
+
+                    @unless($efectivoDisponible)
+                        <div class="mt-4 flex items-start gap-3 rounded-2xl border border-warning/25 bg-warning/5 px-4 py-3.5">
+                            <svg class="w-4 h-4 text-warning shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+                            </svg>
+                            <p class="text-xs text-warning/90 leading-relaxed">
+                                @if(blank($user->provincia) || blank($user->ciudad))
+                                    El pago en efectivo requiere coordinar un punto de encuentro. Completá tu provincia y ciudad en tu <a href="{{ route('profile.edit') }}" class="underline font-medium">perfil</a> para habilitarlo.
+                                @else
+                                    El pago en efectivo no está disponible para este pedido: hay productos de vendedores de otra provincia o ciudad.
+                                @endif
+                            </p>
+                        </div>
+                    @endunless
 
                     {{-- Aviso contextual USDT --}}
                     <div x-show="metodo === 'usdt'" x-cloak x-transition

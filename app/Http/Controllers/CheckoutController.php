@@ -17,7 +17,7 @@ class CheckoutController extends Controller
 {
     public function index(): View|RedirectResponse
     {
-        $cart = Cart::with('items.product')->where('user_id', auth()->id())->first();
+        $cart = Cart::with('items.product.seller')->where('user_id', auth()->id())->first();
 
         if (! $cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('info', 'Tu carrito está vacío.');
@@ -26,8 +26,9 @@ class CheckoutController extends Controller
         $items = $cart->items;
         $total = $items->sum(fn ($item) => $item->product->price * $item->quantity);
         $user = auth()->user();
+        $efectivoDisponible = $cart->efectivoDisponiblePara($user);
 
-        return view('pedido.index', compact('items', 'total', 'user'));
+        return view('pedido.index', compact('items', 'total', 'user', 'efectivoDisponible'));
     }
 
     public function store(ProcessCheckoutRequest $request): RedirectResponse

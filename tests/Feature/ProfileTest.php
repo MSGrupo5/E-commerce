@@ -44,6 +44,46 @@ class ProfileTest extends TestCase
         $this->assertNull($user->email_verified_at);
     }
 
+    public function test_profile_can_update_provincia_and_ciudad(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile', [
+                'name' => $user->name,
+                'apellido' => $user->apellido,
+                'email' => $user->email,
+                'provincia' => 'Mendoza',
+                'ciudad' => 'Mendoza Capital',
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $user->refresh();
+
+        $this->assertSame('Mendoza', $user->provincia);
+        $this->assertSame('Mendoza Capital', $user->ciudad);
+    }
+
+    public function test_profile_rejects_invalid_provincia(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile', [
+                'name' => $user->name,
+                'apellido' => $user->apellido,
+                'email' => $user->email,
+                'provincia' => 'Provincia Inexistente',
+            ]);
+
+        $response->assertSessionHasErrors(['provincia']);
+    }
+
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
     {
         $user = User::factory()->create();
