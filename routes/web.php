@@ -63,6 +63,7 @@ Route::prefix('panel')
             ->name('productos.toggle-activo');
         Route::get('pedidos', [OrderController::class, 'index'])->name('orders');
         Route::patch('pedidos/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
+        Route::get('saldo', [App\Http\Controllers\Seller\BalanceController::class, 'index'])->name('balance');
         Route::get('compras', [App\Http\Controllers\Seller\ComprasController::class, 'index'])->name('compras');
     });
 
