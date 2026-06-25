@@ -27,12 +27,16 @@ class CheckoutTest extends TestCase
         
         $this->user = User::factory()->create([
             'role' => 'cliente',
-            'direccion_entrega' => 'Calle Falsa 123',
+            'info_entrega' => 'Calle Falsa 123',
+            'provincia' => 'Buenos Aires',
+            'ciudad' => 'La Plata',
         ]);
 
         $this->seller = User::factory()->create([
             'name' => 'Vendedor Oficial Gamer',
             'role' => 'cliente',
+            'provincia' => 'Buenos Aires',
+            'ciudad' => 'La Plata',
         ]);
         
         $category = Category::create([
@@ -243,5 +247,84 @@ class CheckoutTest extends TestCase
             ->patch(route('checkout.comprobante', $order), ['usdt_tx_hash' => 'abc123hash']);
 
         $response->assertStatus(404);
+    }
+
+    public function test_efectivo_disponible_cuando_comprador_y_vendedor_comparten_ubicacion(): void
+    {
+        $cart = Cart::getOrCreate($this->user);
+        CartItem::create(['cart_id' => $cart->id, 'product_id' => $this->product->id, 'quantity' => 1]);
+
+        $response = $this->actingAs($this->user)->get(route('checkout.index'));
+
+        $response->assertOk();
+        $response->assertDontSee('No disponible');
+    }
+
+    public function test_efectivo_no_disponible_si_vendedor_es_de_otra_provincia(): void
+    {
+        $this->seller->update(['provincia' => 'Córdoba', 'ciudad' => 'Córdoba']);
+
+        $cart = Cart::getOrCreate($this->user);
+        CartItem::create(['cart_id' => $cart->id, 'product_id' => $this->product->id, 'quantity' => 1]);
+
+        $response = $this->actingAs($this->user)->get(route('checkout.index'));
+
+        $response->assertOk();
+        $response->assertSee('No disponible');
+        $response->assertSee('hay productos de vendedores de otra provincia o ciudad');
+    }
+
+    public function test_efectivo_no_disponible_si_comprador_no_completo_su_ubicacion(): void
+    {
+        $this->user->update(['provincia' => null, 'ciudad' => null]);
+
+        $cart = Cart::getOrCreate($this->user);
+        CartItem::create(['cart_id' => $cart->id, 'product_id' => $this->product->id, 'quantity' => 1]);
+
+        $response = $this->actingAs($this->user)->get(route('checkout.index'));
+
+        $response->assertOk();
+        $response->assertSee('Completá tu provincia y ciudad');
+    }
+
+    public function test_checkout_store_rechaza_efectivo_si_vendedor_es_de_otra_ubicacion(): void
+    {
+        $this->seller->update(['provincia' => 'Córdoba', 'ciudad' => 'Córdoba']);
+
+        $cart = Cart::getOrCreate($this->user);
+        CartItem::create(['cart_id' => $cart->id, 'product_id' => $this->product->id, 'quantity' => 1]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('checkout.store'), [
+                'shipping_address' => 'Calle Falsa 123',
+                'phone'            => '11 2345-6789',
+                'payment_method'   => 'efectivo',
+            ]);
+
+        $response->assertSessionHasErrors(['payment_method']);
+
+        $this->assertDatabaseMissing('orders', [
+            'user_id' => $this->user->id,
+        ]);
+    }
+
+    public function test_checkout_store_acepta_efectivo_si_comparten_ubicacion(): void
+    {
+        $cart = Cart::getOrCreate($this->user);
+        CartItem::create(['cart_id' => $cart->id, 'product_id' => $this->product->id, 'quantity' => 1]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('checkout.store'), [
+                'shipping_address' => 'Calle Falsa 123',
+                'phone'            => '11 2345-6789',
+                'payment_method'   => 'efectivo',
+            ]);
+
+        $response->assertSessionDoesntHaveErrors();
+
+        $this->assertDatabaseHas('orders', [
+            'user_id' => $this->user->id,
+            'payment_method' => 'efectivo',
+        ]);
     }
 }

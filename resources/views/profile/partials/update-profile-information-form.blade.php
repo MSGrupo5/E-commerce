@@ -30,10 +30,34 @@
         </div>
 
         <div>
-            <x-input-label for="direccion_entrega" value="Dirección de entrega" />
-            <x-text-input id="direccion_entrega" name="direccion_entrega" type="text" class="mt-1 block w-full" :value="old('direccion_entrega', $user->direccion_entrega)" autocomplete="street-address" />
-            <x-input-error class="mt-2" :messages="$errors->get('direccion_entrega')" />
+            <x-input-label for="info_entrega" value="Dirección de entrega" />
+            <x-text-input id="info_entrega" name="info_entrega" type="text" class="mt-1 block w-full" :value="old('info_entrega', $user->info_entrega)" autocomplete="street-address" />
+            <x-input-error class="mt-2" :messages="$errors->get('info_entrega')" />
         </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <x-input-label for="provincia" value="Provincia" />
+                <select id="provincia" name="provincia"
+                    class="mt-1 block w-full rounded-md border-border bg-background text-text shadow-sm focus:border-primary focus:ring-primary">
+                    <option value="">Sin especificar</option>
+                    @foreach (\App\Models\User::PROVINCIAS as $provincia)
+                        <option value="{{ $provincia }}" @selected(old('provincia', $user->provincia) === $provincia)>{{ $provincia }}</option>
+                    @endforeach
+                </select>
+                <x-input-error class="mt-2" :messages="$errors->get('provincia')" />
+            </div>
+
+            <div>
+                <x-input-label for="ciudad" value="Ciudad" />
+                <x-text-input id="ciudad" name="ciudad" type="text" class="mt-1 block w-full" :value="old('ciudad', $user->ciudad)" autocomplete="address-level2" />
+                <x-input-error class="mt-2" :messages="$errors->get('ciudad')" />
+            </div>
+        </div>
+
+        <p class="text-xs text-muted">
+            Completá tu provincia y ciudad para poder coordinar un punto de encuentro y habilitar el pago en efectivo con vendedores de tu misma zona.
+        </p>
 
         <div>
             <x-input-label for="email" :value="__('Email')" />
