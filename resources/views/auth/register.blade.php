@@ -30,6 +30,9 @@
                     <div>
                         <label for="name" class="block text-small font-semibold text-muted mb-1.5">Nombre</label>
                         <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
+                            minlength="2" maxlength="50"
+                            pattern="[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-]+"
+                            title="Solo letras, espacios o guiones"
                             class="w-full bg-background border border-border rounded-xl px-4 py-3 text-text text-h6 outline-none focus:border-primary transition-all"
                             placeholder="Juan">
                         <x-input-error :messages="$errors->get('name')" class="mt-1 text-error text-label" />
@@ -38,6 +41,9 @@
                     <div>
                         <label for="apellido" class="block text-small font-semibold text-muted mb-1.5">Apellido</label>
                         <input id="apellido" type="text" name="apellido" value="{{ old('apellido') }}" required
+                            minlength="2" maxlength="50"
+                            pattern="[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-]+"
+                            title="Solo letras, espacios o guiones"
                             class="w-full bg-background border border-border rounded-xl px-4 py-3 text-text text-h6 outline-none focus:border-primary transition-all"
                             placeholder="Pérez">
                         <x-input-error :messages="$errors->get('apellido')" class="mt-1 text-error text-label" />
