@@ -19,13 +19,19 @@
 
         <div>
             <x-input-label for="name" value="Nombre" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name"
+                minlength="2" maxlength="50"
+                pattern="[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-]+"
+                title="Solo letras, espacios o guiones" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         <div>
             <x-input-label for="apellido" value="Apellido" />
-            <x-text-input id="apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido', $user->apellido)" required autocomplete="family-name" />
+            <x-text-input id="apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido', $user->apellido)" required autocomplete="family-name"
+                minlength="2" maxlength="50"
+                pattern="[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-]+"
+                title="Solo letras, espacios o guiones" />
             <x-input-error class="mt-2" :messages="$errors->get('apellido')" />
         </div>
 

@@ -51,12 +51,12 @@ Tres roles en `users.role`: `admin`, `usuario` (default al registrarse). Todos l
 | `/` | — | `home`, `products.*` | Catálogo público |
 | `/carrito` | — (GET/POST público) | `cart.*` | Carrito (guest y auth) |
 | `/favoritos` | `auth` | `favorites.*` | Favoritos |
-| `/pedido` | `auth` | `checkout.*` | Checkout |
+| `/pedido` | `auth`, `redirect.if.admin` | `checkout.*` | Checkout |
 | `/admin` | `auth`, `admin` | `admin.` | Panel admin |
-| `/panel` | `auth` | `seller.` | Panel vendedor |
+| `/panel` | `auth`, `redirect.if.admin` | `seller.` | Panel vendedor |
 | `/profile` | `auth` | `profile.*` | Perfil de usuario |
 
-> **Nota:** `/carrito` GET y POST son públicos (guests pueden agregar al carrito). `/carrito/{cartItem}` PATCH y DELETE, y todo `/favoritos`, requieren auth.
+> **Nota:** `/carrito` GET y POST son públicos (guests pueden agregar al carrito). `/carrito/{cartItem}` PATCH y DELETE, y todo `/favoritos`, requieren auth. El middleware `redirect.if.admin` (`RedirectIfAdmin`) devuelve a los admins a `admin.dashboard` si intentan acceder al panel vendedor o al checkout.
 
 ### Controllers
 
@@ -66,6 +66,8 @@ Tres namespaces:
 - `App\Http\Controllers\Seller\` — `DashboardController`, `ProductController` (resource completo + `toggleActivo()`), `OrderController` (ventas recibidas), `ComprasController` (compras hechas por el vendedor como comprador, vía `pedidos`/`compras`)
 
 `Seller\ProductController` usa `StoreProductRequest` y `UpdateProductRequest` en lugar de validación inline. Ambas requests aplican `App\Rules\SinContenidoOfensivo` a `name` y `description` (filtro de contenido ofensivo por tokens/frases en español rioplatense) y limitan `description` a 1000 caracteres.
+
+`Admin\UserController` expone un solo action extra: `toggleStatus` (`PATCH /admin/usuarios/{user}/toggle`) que alterna el campo `is_active` del usuario (activo/inactivo). No hay destroy de usuarios.
 
 ### FormRequests (`app/Http/Requests/`)
 
@@ -100,6 +102,8 @@ Detalles clave de modelos:
 - `Product::imageUrl` (accessor) — si `image` ya es una URL absoluta (`http...`) la devuelve tal cual, sino la resuelve vía `asset('storage/...')`.
 - `Cart::getOrCreate(User $user)` — factory estático; usar siempre en lugar de `Cart::firstOrCreate()` directamente.
 - `Cart::efectivoDisponiblePara(User $buyer)` — el pago en efectivo requiere coordinar un punto de encuentro, así que solo está disponible si el comprador y todos los vendedores del carrito comparten `provincia` y `ciudad` (comparación normalizada vía `User::livesInSameLocationAs()`). Se valida tanto en `CheckoutController::index()` (para deshabilitar la opción en la UI) como en `ProcessCheckoutRequest` (server-side).
+- `Order::status` — máquina de estados: `pending` (default) → `paid` o `cancelled`. Solo pedidos `pending` pueden cambiar de estado. Los vendedores lo actualizan vía `Seller\OrderController::updateStatus()`; los admins no tienen esta acción. Métodos helper: `isPending()`, `isPaid()`, `isCancelled()`.
+- `Order::payment_method` — valores válidos: `efectivo`, `tarjeta`, `usdt`. Los pedidos `usdt` aceptan un comprobante posterior vía `PATCH /pedido/{order}/comprobante` que guarda `usdt_tx_hash`.
 - `User::apellido`, `User::info_entrega`, `User::provincia`, `User::ciudad` — campos adicionales (no estándar de Breeze). `provincia` usa la constante `User::PROVINCIAS` (24 provincias argentinas) como lista cerrada.
 
 > **Nota histórica:** la columna se llamaba `direccion_entrega`; otra rama del equipo la renombró a `info_entrega` directamente en la base compartida sin commitear la migración. La migración `rename_direccion_entrega_to_info_entrega_and_add_location_to_users_table` es idempotente para reconciliar ambos estados.
@@ -115,14 +119,18 @@ Estructura de sesión: `session('cart.items') = [['product_id' => int, 'quantity
 ### Checkout Flow
 
 1. `/carrito` → usuario ve items y CTA "Finalizar compra" (auth) o "Iniciar sesión para comprar" (guest)
-2. `/pedido` — `CheckoutController::index()` muestra form con dirección de entrega
+2. `/pedido` — `CheckoutController::index()` muestra form con dirección de entrega, teléfono, método de pago y notas
 3. POST `/pedido` — `CheckoutController::store()` envuelve en `DB::transaction()` la creación de `Order` + `OrderItem`s, el decremento de stock y el vaciado de carrito
 4. Redirige a `/pedido/{order}/confirmacion`
+5. (Solo USDT) `PATCH /pedido/{order}/comprobante` — el comprador puede enviar el `usdt_tx_hash` después de confirmar el pago
 
 ### Servicios
 
 - `App\Services\CurrencyService` — cotiza ARS→USD contra `https://dolarapi.com/v1/dolares/blue` (campo `venta`), cacheado 1h (`Cache::remember`). Si la API falla o la tabla de cache no existe (p. ej. en CI sin `cache` table), usa el fallback hardcodeado `1200.0` en vez de romper. Se invoca en **cada request**: `AppServiceProvider::boot()` registra un `View::composer('*', ...)` que comparte la variable `usdToArs` (el rate de `getRate()`) a todas las vistas.
 - `App\Rules\SinContenidoOfensivo` — `ValidationRule` usado en `name`/`description` de productos; bloquea tokens y frases ofensivas (homofobia, racismo, ableísmo, xenofobia, vulgaridad rioplatense) con normalización de espacios para detectar variantes pegadas.
+- `config/marketplace.php` — expone `marketplace.commission_rate` (env `COMMISSION_RATE`, default `10`%). Lo usa `Seller\BalanceController` para calcular el neto del vendedor sobre sus `OrderItem` de pedidos `paid`.
+
+`products.suggestions` (`GET /productos/sugerencias?search=...`) es un endpoint JSON para el autocomplete de la barra de búsqueda: mínimo 2 chars, retorna hasta 6 productos activos con `id`, `name`, `price_formatted`, `image_url`, `url`.
 
 `AppServiceProvider::boot()` también fija `Paginator::defaultView('vendor.pagination.marketo')` — la paginación en toda la app usa la vista custom `resources/views/vendor/pagination/marketo.blade.php` en vez del estilo Tailwind por defecto.
 
@@ -152,6 +160,18 @@ Estructura de sesión: `session('cart.items') = [['product_id' => int, 'quantity
 | `<x-ui.category-filter>` | `components/ui/category-filter.blade.php` | `$categories`, `$categorySlug`, `$frontOnly` |
 
 Las imágenes de productos se almacenan en `Storage::disk('public')` bajo `products/` y se sirven vía symlink `storage`.
+
+### Testing
+
+Tests corren contra SQLite en memoria (`DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:` en `phpunit.xml`). Los tests de Feature usan el trait `RefreshDatabase`. El suite está dividido en `tests/Unit/` (lógica de servicios/reglas/policies) y `tests/Feature/` (rutas HTTP con usuario actingAs).
+
+```bash
+# Correr un test específico por clase
+php artisan test --filter=OrderStatusTest
+
+# Correr solo los tests de Feature de Seller
+php artisan test tests/Feature/Seller
+```
 
 ## Git & Commit Conventions
 

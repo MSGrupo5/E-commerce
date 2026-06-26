@@ -32,10 +32,17 @@ class RegisteredUserController extends Controller
     {
         // Validamos incluyendo el campo apellido (MSGRUP-27)
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'apellido' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'name'     => ['required', 'string', 'min:2', 'max:50', 'regex:/^[\p{L}\s\-]+$/u'],
+            'apellido' => ['required', 'string', 'min:2', 'max:50', 'regex:/^[\p{L}\s\-]+$/u'],
+            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'name.regex'     => 'El nombre solo puede contener letras, espacios o guiones.',
+            'name.min'       => 'El nombre debe tener al menos 2 caracteres.',
+            'name.max'       => 'El nombre no puede superar los 50 caracteres.',
+            'apellido.regex' => 'El apellido solo puede contener letras, espacios o guiones.',
+            'apellido.min'   => 'El apellido debe tener al menos 2 caracteres.',
+            'apellido.max'   => 'El apellido no puede superar los 50 caracteres.',
         ]);
 
         $user = User::create([
