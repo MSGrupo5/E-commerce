@@ -1,4 +1,4 @@
-# 🛒 Marketo E-commerce
+# 🛒 Marketo 
 
 > Plataforma de catálogo multidivendedor — Proyecto académico · Gestión de Sistemas · Metodología Scrum
 
